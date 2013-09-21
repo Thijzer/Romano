@@ -1,0 +1,13 @@
+<?php
+function js_after(){?>
+
+<?}
+function css_after(){?>
+
+<?}
+function content($data){
+extract($data);?>
+
+
+
+<?}?>
