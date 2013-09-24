@@ -68,12 +68,12 @@ class Users
   {
   	if (isset($_GET['username']) && isset($_GET['id'])) {
 
-			$errors = $this->user->checkActivation($_GET['username'], $_GET['id']);
-			if (!$errors) {
+			$error = $this->user->checkActivation($_GET['username'], $_GET['id']);
+			if (!$error) {
 				$this->user->activateUser();
 				$data['msg']['notice'] = 'thank you, your account has been activated';
 			} else {
-				$data['msg']['errors'] = $errors;
+				$data['msg']['errors'] = $error;
 			}
 		} else {
 			$data['msg']['errors'] = 'something went wrong!';

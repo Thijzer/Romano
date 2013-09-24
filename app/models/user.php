@@ -7,9 +7,8 @@ class User
 
 	function __construct()
 	{
-		$this->db 				= new Database;
-		$this->active 		= rand(1000,9999);
-		$this->resetcode 	= $this->random().$this->active;
+		$this->db 	= new Database;
+		$this->code = $this->random().rand(1000,9999);
 	}
 
 	// check something
@@ -53,7 +52,7 @@ class User
 	{
 		if (!$code) {
 			return false;
-		} elseif (mb_strlen($code) !== mb_strlen($this->resetcode)) {
+		} elseif (mb_strlen($code) !== mb_strlen($this->code)) {
 			return false;
 		}elseif (!$result = $this->db->query("SELECT `uid` FROM `users` WHERE `reset` = '$code'")->fetch(PDO::FETCH_ASSOC)) {
 			return false;
@@ -63,15 +62,15 @@ class User
 	}
 	function checkActivation($u, $id)
 	{
-		$result = $this->db->query("SELECT `active` FROM `users` WHERE `username` = '$u'")->fetch(PDO::FETCH_ASSOC);
+		$result = $this->db->get('users', array('username' => $u, 'reset' => $id),['fields' => 'active, reset'])->fetch();
 		if ($result['active'] === '1') {
 			return "this account is already activated";
-		} elseif (!$result['active'] === '$id') {
+		} elseif ($result['reset'] !== $id) {
 			return "can't activate this user, please contact the administrator";
 		} elseif (!$this->checkDB(['username' => $u])) {
 			return "username is not know to us";
 		} else {
-			$this->active = $result['active'];
+			$this->code = $result['reset'];
 			$this->u = $u;
 		}
 	}
@@ -92,26 +91,26 @@ class User
 	}
 	function activateUser()
 	{
-		$this->db->query("UPDATE `users` SET `active` = '1' WHERE `username` = '$this->u' AND `active` = '$this->active'");
+		$this->db->query("UPDATE `users` SET `active` = '1', `reset` = null WHERE `username` = '$this->u' AND `reset` = '$this->code'");
 	}
 	function registerUser()
 	{
-		$this->db->add('users', array('username' => $this->u, 'email' => $this->e, 'password' => $this->p, 'active' => $this->active));
+		$this->db->add('users', array('username' => $this->u, 'email' => $this->e, 'password' => $this->p, 'reset' => $this->code));
 
 		$subject	= "Confirm you are $this->u";
 		$body		  = "Hallo $this->u and welcome to our site.\n\n";
 		$body		 .= "We would like you to confirm your username and registration by activating this link\n\n";
-		$body		 .= site."users/activate?id=$this->active&username=$this->u\n\n";
+		$body		 .= site."users/activate?id=$this->code&username=$this->u\n\n";
 		$body		 .= "thank you,\nthe ".title." team.";
 		$this->sendMail($this->e, $subject, $body);
 	}
 	function lost($e)
 	{
-		$url 			= site."users/reset/".$this->resetcode;
+		$url 			= site."users/reset/".$this->code;
 		$subject	= title.": reset code";
 		$body			= "here is your reset code \n".$url."\n\nthank you,\nthe ".title." team";
-		$this->db->query("UPDATE `users` SET `reset` = '$this->resetcode' WHERE `email` = '$e'");
-		//$this->db->edit('users', array('email' => $this->e))->set('reset' => $this->resetcode);
+		$this->db->query("UPDATE `users` SET `reset` = '$this->code' WHERE `email` = '$e'");
+		//$this->db->edit('users', array('email' => $this->e))->set('reset' => $this->code);
 		$this->sendMail($e, $subject, $body);
 	}
 	function resetUser()
