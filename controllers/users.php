@@ -23,26 +23,63 @@ class Users
 
 			if (!$q = $u.$p.$m) {
 				$this->user->registerUser();
-				header('Location: '.site.$_SESSION['last']); // should be thank you instead of header
-			  die();
+			  die(header('Location: '.site.$_SESSION['last'])); // should be thank you instead of header
 			}
-			$data['errors'] = array('u' => $u, 'p' => $p, 'm' => $m);
+			$data['msg']['errors'] = array('u' => $u, 'p' => $p, 'm' => $m);
 		}
-		$this->view->render($data, 'Register', 'no');
+		$this->view->render($data, ['theme' =>'no']);
 	}
 	public function lost($data)
 	{
-		$data['data'] = $this->user->isLost();
-		$this->view->render($data, 'Lost', 'no');
+  	if (isset($_POST['lost'])) {
+  		$e     = $_POST['email'];
+			$error = $this->user->checkMail($e); // a problem with the check
+
+			if ($error === $e. ' exists') {
+				$this->user->lost($e);
+				$data['msg']['notice'] = 'a reset mail has been sent';
+			} elseif (!$error) {
+				$data['msg']['errors'] = 'email is not reconized';
+			} else {
+				$data['msg']['errors'] = $error;
+			}
+		}
+		$this->view->render($data, ['theme' => 'no']);
 	}
 	public function reset($data)
 	{
-		$data['data'] = $this->user->reset($args['args']);
-		$this->view->render($data, 'Reset', 'no');
+		if($uid = $this->user->checkReset($data['section'][2]) === false) {
+			$this->view->error(1337, 'from reset'); echo $uid;
+		}
+		if (isset($_POST['reset'])) {
+			$error = $this->user->checkPass($_POST['password'],$_POST['password2']);
+
+			if (!$error) {
+				$this->user->resetUser($uid);
+				$data['msg']['notice'] = 'user is reset, thank you!';
+				//die(header('Location: /'));
+			} else {
+				$data['msg']['errors'] = $error;
+			}
+		}
+		$this->view->render($data, ['theme' => 'no']);
 	}
   public function activate($data)
   {
-  	$data['msg'] = $this->user->checkActivation();
-  	$this->view->render($data, 'Activate', 'no');
+  	if (isset($_GET['username']) && isset($_GET['id'])) {
+
+			$errors = $this->user->checkActivation($_GET['username'], $_GET['id']);
+			if (!$errors) {
+				$this->user->activateUser();
+				$data['msg']['notice'] = 'thank you, your account has been activated';
+			} else {
+				$data['msg']['errors'] = $errors;
+			}
+		} else {
+			$data['msg']['errors'] = 'something went wrong!';
+		}
+  	$this->view->render($data, ['theme' => 'no']);
   }
 }
+
+?>

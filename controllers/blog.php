@@ -1,26 +1,25 @@
 <?php
-require (MODEL.'post.php');
 
-class Blog
+class Blog extends Ctrlr
 {
-	private $view,$post;
+	private $view;
 
 	public function __construct()
 	{
-	$this->post = new Post();
-	$this->view = new View();
+		$this->view = new View();
 	}
 	public function article($data)
 	{
-		if (!$data['post'] = $this->post->getPost($data['section'][2]) OR !empty($data['section'][3]))
+		$post = $this->_init_('post');
+		if (!$data['post'] = $post->getPost($data['section'][2]))
 		{
 			$this->view->error(404,'from article');
 		}
-		$data['comments'] = $this->post->getComments($data['section'][2]);
+		$data['comments'] = $post->getComments($data['section'][2]);
 
 		if (isset($_POST['body']) && isset($_POST['user']))
 		{
-			$this->post->addComment($data['section'][2], $_POST['user'], $_POST['body']);
+			$post->addComment($data['section'][2], $_POST['user'], $_POST['body']);
 		}
 		$this->view->render($data);
 	}

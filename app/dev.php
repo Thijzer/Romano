@@ -13,7 +13,7 @@ function dump($i)
 //dumps data passed
 function devdump($data)
 {
-	$time = substr(microtime(true) - TIMER ,0,5);
+	$time = timestamp();
   echo "<div class = 'well' style='background-color: rgb(229, 103, 103)'>";
   echo '<h3>DEVELOPERS PAGE</h3>';
   echo "Page loaded in $time seconds<br><br>";
@@ -21,4 +21,5 @@ function devdump($data)
   if(!empty($data)){echo '<h4>DATA</h4>';dump($data);}
   echo '</div>';
 }
+
 ?>

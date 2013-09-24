@@ -18,7 +18,6 @@ extract($data);
         <label class="checkbox">
           <input type="checkbox" value="remember-me"> Remember me
         	<a href="<?php echo site;?>users/lost">password lost?</a>
-          <div style="color: red"><?php echo $msg;?></div>
         </label>
         <button class="btn btn-lg btn-primary btn-block" name="login" type="submit">Login</button>
       </form>

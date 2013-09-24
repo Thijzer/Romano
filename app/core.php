@@ -1,127 +1,106 @@
 <?php
-
-class Router
+class Route
 {
-  private $route;
+  var $r = array();
 
-  public function prepareRoute($i1,$i2,$i3)
-  { // feeds the autoroute with the correct path if that exists
-    define('url', filter_var(trim($_GET[$i3], $i1), FILTER_SANITIZE_URL)); // trim and sanitize the URL
-    //list(url, $this->route['act']) = explode($i2, url); //find actions with a dot in the end
-    $this->route['section'] = explode($i1, url); //split the sections
-    unset($_GET[$i3]);
+  public function __construct()
+  {
+    $this->r['section'] = explode('/', url);
+    $pos = count($this->r['section']);
+    list($this->r['section'][$pos-1], $this->r['action']) = explode('.', $this->r['section'][$pos-1]);
 
-    if(empty($this->route['section'][1]))
-    {
-      $this->missingMethod();
-    }
-    $this->autoRoute($this->route['section'][0], $this->route['section'][1]);
-  }
-
-  private function missingMethod()
-  { // find a location for the missing method
-    $ctrlr = $this->route['section'][0];
-
-    if (empty($ctrlr))
-    { //maybe its home, no path = home/index
-      $this->autoRoute('home', 'index');
-    }
-    elseif (file_exists(VIEW.'home/'.$ctrlr.EXT))
-    { //maybe its a file in home, if home/file exists
-      $this->autoRoute('home', $ctrlr);
-    }
-    elseif (file_exists(VIEW.$ctrlr.'/index'.EXT))
-    { //maybe its and index in a folder, if path/index exists
-      $this->autoRoute($ctrlr, 'index');
-    }
-    else
-    {
-      require(CONTROLLER.'home'.EXT);
-      $init = new Home();
-      if (method_exists($init, $ctrlr) AND $ctrlr !== '__construct')
-      {
-          $init->{$ctrlr}($this->route);
-          exit();
+    if (!$this->r['section'][1]) {
+      if (!$ctrlr = $this->r['section'][0]) {
+        $this->autoRoute('home', 'index');
+      } elseif (file_exists(VIEW.$ctrlr.'/index.php')) {
+        $this->autoRoute($ctrlr, 'index');
+      } else {
+        $this->autoRoute('home', $ctrlr);
       }
     }
+    $this->autoRoute($this->r['section'][0], $this->r['section'][1]);
   }
-
   private function autoRoute($ctrlr, $method)
-  { // autoloads controller and method if exists
-    $this->route['path'] = $ctrlr.'/'.$method;
-    if (file_exists(CONTROLLER.$ctrlr.EXT))
-    {
-      require(CONTROLLER.$ctrlr.EXT);
+  {
+    $this->r['path'] = $ctrlr.'/'.$method;
+    $this->r['section'][0] = $ctrlr;
+    $this->r['section'][1] = $method;
+    if (file_exists (CONTROLLER.$ctrlr.'.php')) {
+      require (CONTROLLER.$ctrlr.'.php');
       $class = ucfirst($ctrlr);
       $init = new $class();
-      if (method_exists($init, $method) AND $method !== '__construct')
-      {
-        $init->{$method}($this->route);
+      if (method_exists($init, $method) && $method !== '__construct' && $method !== '_init_') {
+        $init->{$method}($this->r);
         exit();
       }
     }
     $view = new View();
-    // if no_file/no_controller/no_function exists, we break the site with a 404 / dead end
-    if (!file_exists(VIEW.$this->route['path'].EXT))
-    {
-      $view->error(404,'from autoroute');
+    if (file_exists (VIEW.$this->r['path'].'.php')) {
+      $view->render($this->r,['title' => $method]);
     }
-    // else we load the view without controller/method functionality
-    $view->render($this->route, ucfirst($method));
+    $view->error(404,'from autoRoute, no page found');
   }
 }
-
 class View
 {
-  public function render($data, $title = null, $theme = null)
+  public function render($data,$arg = array())
   {
-    require(TMPL.'theme_library.php');
-    require(VIEW.$data['path'].EXT);
+    $arg = array_merge(array('title' => ucfirst($data['section'][1]), 'path' => $data['path'], 'theme' => null),$arg);
+    require_once (VIEW.$arg['path'].'.php');
+    require_once (TMPL.'theme_library.php');
 
-    if ($title === null) {$title = ucfirst($data['section'][1]);}
-    head($title.=' - '.title);
-    css();
-
-    if($theme === null)
-    {
-      echo '</head><body>';
-      nav();
+    head($arg['title']); css(); notice($data['msg']); if(DEV_ENV === true){echo timestamp(6);}
+    echo "\n  </head>\n  <body>\n";
+    if (is_null($arg['theme'])) {
+      nav(); content($data); footer(); js();
+      echo "\n  </body>\n</html>";
+      $this->track(null, timestamp());
+    } else {
       content($data);
-      footer();
-      js();
-      echo '</body></html>';
     }
-    else
-    {
-      echo '</head><body>';
-      content($data);
-      echo '</body></html>';
-    }
-    $this->track();
-    die();
+      echo "\n  </body>\n</html>";
+      die();
   }
   public function error($page,$msg = null)
   {
-    require(TMPL.'theme_library.php');
-    require(VIEW.'error/'.$page.'.php');
-    $this->track($page.' : '.$msg);
+    require_once (TMPL.'theme_library.php');
+    require_once (VIEW.'error/'.$page.'.php');
+    $this->track($page.': '.$msg, timestamp());
     die();
   }
-  private function track($msg = null)
+  private function track($msg = null,$timestamp)
   {
-    if($_SESSION['current'] !== url)
-    {
+    if ($_SESSION['current'] !== url) {
       $_SESSION['last'] = $_SESSION['current'];
       $_SESSION['current'] = url;
-
-      $_SESSION['track'][] = array(
-      'time'  => time(),
-      'page'  => url,
-      'uid'   => $_SESSION['user']['uid'],
-      'speed' => str_replace('.','',substr(microtime(true) - TIMER ,0,5)),
-      'msg'   => $msg
-      );
+      if ($msg) {
+        $slip = '-error';
+        $msg  = '; msg: '.substr($msg,0,80);
+      }
+      if ($_SESSION['uid']) { $uid = '; uid: '.$_SESSION['uid'];}
+      $track = 'date: '.date('j/m H:i:s').'; page: /'.url.$uid.'; speed: '.$timestamp.'ms'.$msg."\r\n";
+      if (DEV_ENV !== true OR $msg) {
+        $file = fopen(PROJECT.'logs/'.date('MY').$slip.'.log', 'a+');
+        fwrite($file,$track);
+        fclose($file);
+      } else {
+        echo $track;
+      }
     }
   }
 }
+class Model
+{
+}
+class Ctrlr
+{
+  protected function _init_($i)
+  {
+    require (MODEL.$i.'.php');
+    $class = ucfirst($i);
+    $init = new $class();
+    return $init;
+  }
+}
+New Route;
 ?>

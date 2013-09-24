@@ -1,6 +1,5 @@
 <?php
-require(MODEL.'database.php');
-
+include_once (MODEL.'database.php');
 class Post
 {
   public $db;
@@ -51,18 +50,14 @@ class Post
 
   function editPost($pid)
   {
-    $pid  = (int)$pid;
-
-    if ($_POST)
-    {
-      if ($_POST['tag'])
-      {
+    if(is_numeric($pid)) {
+      if ($_POST['tag']) {
         $_POST['tag'] = $this->addTags($_POST['tag']);
       }
-      $this->edit('posts', $_POST);
-    }
-    else
-    {
+      if ($_POST) {
+        $this->db->edit('posts', $_POST);
+      }
+    } else {
       return $this->getPost($pid);
     }
   }

@@ -11,6 +11,7 @@ Thumbs.db
 #project files#
 ###############
 config.php
+config.server.php
 pub/assets
 pub/files/resume.pdf
 pub/ico

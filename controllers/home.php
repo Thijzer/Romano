@@ -1,68 +1,58 @@
 <?php
-class Home
+class Home extends Ctrlr
 {
-	private $view;
+  private $view;
 
-	public function __construct()
-	{
-	$this->view = new View();
-	}
+  public function __construct()
+  {
+    $this->view = new View();
+  }
 	public function index($data)
 	{
-		require(MODEL.'post.php');
-		$post = new Post();
+		$post = $this->_init_('post');
 		$data['titles'] = $post->getTitles();
 		$data['post'] = $post->getPosts();
-		$this->view->render($data, 'Blog');
+		$this->view->render($data, ['title' => 'Blog']);
 	}
 	public function contact($data)
 	{
-		if(isset($_POST['submit'])) {
-			require(MODEL.'user.php');
-			$user 	= new User();
-			$errors = $user->checkMail();
+		if (isset($_POST['submit'])) {
 
-			if (!$errors) {
-				$name 			= $_POST['name'];
-				$subject		= "Contact Msg from $name";
-				$usermail 	= $_POST['email'];
-				$email			= 'Thijs.dp@gmail.com';
-				$body				= "user : $name, email : $usermail has sent the following message : ";
-				$body				.= $_POST['Fmessage'];
-				sendMail($email, $subject, $body);
-				$data['notice'] = "message is sent!";
+			$user = $this->_init_('user');
+
+			if (!$errors  = $user->checkMail($_POST['email'])) {
+				$subject		= 'Contact Msg from '.$_POST['name'];
+				$body				= "user : ".$_POST['name']."\nemail : ".$_POST['email']."\nhas sent the following message : \n".$_POST['Fmessage'];
+				$user->sendMail('Thijs.dp@gmail.com', $subject, $body);
+				$data['msg']['notice'] = "message is sent!"; // $_POST is still active // header with a session msg?
 			} else {
-				$data['errors'] = $errors;
+				$data['msg']['errors'] = $errors;
 			}
 	  }
-	  $this->view->render($data, 'Contact');
+	  $this->view->render($data);
 	}
 	public function login($data)
 	{
-		if(isset($_SESSION['username'])) {
-			header('Location: '.site);
-			die();
+		if (isset($_SESSION['username'])) {
+			$data['msg']['notice'] = 'You are logged in!';
 		}
-		if(isset($_POST['login'])) {
-			require(MODEL.'user.php');
-			$user = new User();
-			if (!$data['user'] = $user->checkLogin($_POST['username'],$_POST['password'])) {
-				$data['msg'] = 'wrong username or password <br/>';
+		if (isset($_POST['login'])) {
+			$user = $this->_init_('user');
+			if (!$data['user'] = $user->loginUser($_POST['username'],$_POST['password'])) {
+				$data['msg']['errors'] = 'wrong username or password <br/>';
 			}
 			else {
 				$_SESSION['username'] = $data['user']['username'];
 				$_SESSION['uid'] 			= $data['user']['uid'];
-				header('Location: '.site.$_SESSION['last']);
-				exit();
+				exit(header('Location: '.site.$_SESSION['last']));
 			}
 		}
-		$this->view->render($data, 'Login', 'no');
+		$this->view->render($data, ['theme' => 'no']);
 	}
 	public function logout()
 	{
 		unset($_SESSION['username']);
-		header('Location: ' .site.$_SESSION['last']);
-		die();
+		die(header('Location: ' .site.$_SESSION['last']));
 	}
 }
 ?>
