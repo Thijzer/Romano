@@ -13,7 +13,7 @@ class Blog extends Ctrlr
 		$post = $this->_init_('post');
 		if (!$data['post'] = $post->getPost($data['section'][2]))
 		{
-			$this->view->error(404,'from article');
+			$this->view->page(404,'from article');
 		}
 		$data['comments'] = $post->getComments($data['section'][2]);
 

@@ -25,81 +25,56 @@ class Route
     $this->r['path'] = $ctrlr.'/'.$method;
     $this->r['section'][0] = $ctrlr;
     $this->r['section'][1] = $method;
-    if (file_exists (CONTROLLER.$ctrlr.'.php')) {
-      require (CONTROLLER.$ctrlr.'.php');
+    if (file_exists (CONTROLLER.$ctrlr.EXT)) {
+      require (CONTROLLER.$ctrlr.EXT);
       $class = ucfirst($ctrlr);
       $init = new $class();
-      if (method_exists($init, $method) && $method !== '__construct' && $method !== '_init_') {
+      if (method_exists($init, $method) && $method[0] !== '_') {
         $init->{$method}($this->r);
         exit();
       }
     }
     $view = new View();
-    if (file_exists (VIEW.$this->r['path'].'.php')) {
-      $view->render($this->r,['title' => $method]);
+    if (file_exists (VIEW.$this->r['path'].EXT)) {
+      $view->render($this->r);
     }
-    $view->error(404,'from autoRoute, no page found');
+    $view->page(404,'from autoRoute');
   }
 }
 class View
 {
-  public function render($data,$arg = array())
+  public function render($data, $arg = array())
   {
-    $arg = array_merge(array('title' => ucfirst($data['section'][1]), 'path' => $data['path'], 'theme' => null),$arg);
-    require_once (VIEW.$arg['path'].'.php');
-    require_once (TMPL.'theme_library.php');
-
-    head($arg['title']); css(); notice($data['msg']); if(DEV_ENV === true){echo timestamp(6);}
-    echo "\n  </head>\n  <body>\n";
-    if (is_null($arg['theme'])) {
-      nav(); content($data); footer(); js();
-      echo "\n  </body>\n</html>";
-      $this->track(null, timestamp());
-    } else {
-      content($data);
+    $arg = array_merge(array('title' => ucfirst($data['section'][1]), 'path' => $data['path'], 'theme' => 'theme', 'base' => 'base.php'),$arg);
+    require (VIEW.$arg['path'].EXT);
+    if (DEV_ENV === true) { echo timestamp(6);}
+    if ($arg['theme'] !== 'no') {
+      require (TMPL.$arg['theme'].EXT);
+      if ($_SESSION['current'] !== url) { $_SESSION['last'] = $_SESSION['current']; $_SESSION['current'] = url; }
     }
-      echo "\n  </body>\n</html>";
-      die();
-  }
-  public function error($page,$msg = null)
-  {
-    require_once (TMPL.'theme_library.php');
-    require_once (VIEW.'error/'.$page.'.php');
-    $this->track($page.': '.$msg, timestamp());
+    require (TMPL.$arg['base']);
     die();
   }
-  private function track($msg = null,$timestamp)
+  public function page($code,$msg = null)
   {
-    if ($_SESSION['current'] !== url) {
-      $_SESSION['last'] = $_SESSION['current'];
-      $_SESSION['current'] = url;
-      if ($msg) {
-        $slip = '-error';
-        $msg  = '; msg: '.substr($msg,0,80);
-      }
-      if ($_SESSION['uid']) { $uid = '; uid: '.$_SESSION['uid'];}
-      $track = 'date: '.date('j/m H:i:s').'; page: /'.url.$uid.'; speed: '.$timestamp.'ms'.$msg."\r\n";
-      if (DEV_ENV !== true OR $msg) {
-        $file = fopen(PROJECT.'logs/'.date('MY').$slip.'.log', 'a+');
-        fwrite($file,$track);
-        fclose($file);
-      } else {
-        echo $track;
-      }
-    }
+    $data = array('code' => $code, 'msg' => $msg);
+    require (VIEW.'page.php');
+    require (TMPL.'base.php');
+    die();
   }
-}
-class Model
-{
 }
 class Ctrlr
 {
   protected function _init_($i)
   {
-    require (MODEL.$i.'.php');
+    require (MODEL.$i.EXT);
     $class = ucfirst($i);
     $init = new $class();
     return $init;
+  }
+  protected function _hasAccess($i = 7)
+  {
+    if ($_SESSION['level'] >= $i){ return true; }
   }
 }
 New Route;

@@ -6,8 +6,8 @@
 # http://code.google.com/p/sequel-pro/
 #
 # Host: 127.0.0.1 (MySQL 5.5.29-log)
-# Database: none
-# Generation Time: 2013-09-24 14:39:34 +0000
+# Database: thijzer
+# Generation Time: 2013-10-01 20:34:15 +0000
 # ************************************************************
 
 
@@ -35,6 +35,25 @@ CREATE TABLE `comments` (
 
 
 
+# Dump of table gallery
+# ------------------------------------------------------------
+
+CREATE TABLE `gallery` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(50) NOT NULL DEFAULT '',
+  `date` datetime DEFAULT NULL,
+  `description` tinytext,
+  `keycode` varchar(25) DEFAULT NULL,
+  `guestcode` varchar(15) DEFAULT NULL,
+  `active` int(11) DEFAULT '1',
+  `public` tinyint(11) DEFAULT NULL,
+  `path` varchar(100) DEFAULT NULL,
+  `cover` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
 # Dump of table messages
 # ------------------------------------------------------------
 
@@ -49,16 +68,20 @@ CREATE TABLE `messages` (
 
 
 
-# Dump of table pageviews
+# Dump of table pics
 # ------------------------------------------------------------
 
-CREATE TABLE `pageviews` (
+CREATE TABLE `pics` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `udate` int(11) NOT NULL,
-  `page` varchar(50) NOT NULL DEFAULT '',
-  `uid` int(11) DEFAULT NULL,
-  `speed` float DEFAULT NULL,
-  `msg` varchar(75) DEFAULT NULL,
+  `gid` int(11) DEFAULT NULL,
+  `order` int(11) DEFAULT NULL,
+  `date` timestamp NULL DEFAULT NULL,
+  `public` tinyint(1) DEFAULT NULL,
+  `cust_select` tinyint(1) DEFAULT '1',
+  `active` tinyint(1) DEFAULT '1',
+  `title` varchar(128) DEFAULT NULL,
+  `filename` varchar(70) DEFAULT NULL,
+  `path` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 

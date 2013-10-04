@@ -2,5 +2,5 @@
 function content($data){
 extract($data);
 ?>
-
-<?php } ?>
+<div style="color: red"><?echo $msg?></div>
+<?}?>

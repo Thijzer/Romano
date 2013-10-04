@@ -12,7 +12,7 @@ class Home extends Ctrlr
 		$post = $this->_init_('post');
 		$data['titles'] = $post->getTitles();
 		$data['post'] = $post->getPosts();
-		$this->view->render($data, ['title' => 'Blog']);
+		$this->view->render($data, array('title' => 'Blog'));
 	}
 	public function contact($data)
 	{
@@ -23,7 +23,7 @@ class Home extends Ctrlr
 			if (!$errors  = $user->checkMail($_POST['email'])) {
 				$subject		= 'Contact Msg from '.$_POST['name'];
 				$body				= "user : ".$_POST['name']."\nemail : ".$_POST['email']."\nhas sent the following message : \n".$_POST['Fmessage'];
-				$user->sendMail('Thijs.dp@gmail.com', $subject, $body);
+				sendMail('Thijs.dp@gmail.com', $subject, $body);
 				$data['msg']['notice'] = "message is sent!"; // $_POST is still active // header with a session msg?
 			} else {
 				$data['msg']['errors'] = $errors;
@@ -40,18 +40,19 @@ class Home extends Ctrlr
 			$user = $this->_init_('user');
 			if (!$data['user'] = $user->loginUser($_POST['username'],$_POST['password'])) {
 				$data['msg']['errors'] = 'wrong username or password <br/>';
-			}
-			else {
+			} else {
 				$_SESSION['username'] = $data['user']['username'];
 				$_SESSION['uid'] 			= $data['user']['uid'];
-				exit(header('Location: '.site.$_SESSION['last']));
+				$_SESSION['level'] 			= $data['user']['level'];
+				exit(header('Location: ' .site.$_SESSION['last']));
 			}
 		}
-		$this->view->render($data, ['theme' => 'no']);
+		$this->view->render($data, array('theme' => 'no'));
 	}
 	public function logout()
 	{
 		unset($_SESSION['username']);
+		unset($_SESSION['level']);
 		die(header('Location: ' .site.$_SESSION['last']));
 	}
 }

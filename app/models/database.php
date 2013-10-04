@@ -24,7 +24,7 @@ class Database extends PDO
     catch(PDOException $e)
     {
       $view = new View();
-      $view->error('500','PDO_ERROR: '. $e->getMessage());
+      $view->page('500','PDO_ERROR: '. $e->getMessage());
     }
   }
   function get($table,$array,$arg = array())

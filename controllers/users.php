@@ -18,7 +18,7 @@ class Users
 	{
 		if (isset($_POST['register'])) {
 			$u  = $this->user->checkUser($_POST['username']);
-			$p 	= $this->user->checkPass($_POST['password'], $_POST['password2']);
+			$p 	= $this->user->checkPass($_POST['password'],$_POST['password2']);
 			$m  = $this->user->checkMail($_POST['email']);
 
 			if (!$q = $u.$p.$m) {
@@ -27,7 +27,7 @@ class Users
 			}
 			$data['msg']['errors'] = array('u' => $u, 'p' => $p, 'm' => $m);
 		}
-		$this->view->render($data, ['theme' =>'no']);
+		$this->view->render($data, array('theme' =>'no'));
 	}
 	public function lost($data)
 	{
@@ -44,12 +44,12 @@ class Users
 				$data['msg']['errors'] = $error;
 			}
 		}
-		$this->view->render($data, ['theme' => 'no']);
+		$this->view->render($data, array('theme' => 'no'));
 	}
 	public function reset($data)
 	{
 		if($uid = $this->user->checkReset($data['section'][2]) === false) {
-			$this->view->error(1337, 'from reset'); echo $uid;
+			$this->view->page(1337, 'from reset'); echo $uid;
 		}
 		if (isset($_POST['reset'])) {
 			$error = $this->user->checkPass($_POST['password'],$_POST['password2']);
@@ -62,7 +62,7 @@ class Users
 				$data['msg']['errors'] = $error;
 			}
 		}
-		$this->view->render($data, ['theme' => 'no']);
+		$this->view->render($data, array('theme' => 'no'));
 	}
   public function activate($data)
   {
@@ -71,14 +71,14 @@ class Users
 			$error = $this->user->checkActivation($_GET['username'], $_GET['id']);
 			if (!$error) {
 				$this->user->activateUser();
-				$data['msg']['notice'] = 'thank you, your account has been activated';
+				$msg = 'thank you, your account has been activated';
 			} else {
-				$data['msg']['errors'] = $error;
+				$msg = $error;
 			}
 		} else {
-			$data['msg']['errors'] = 'something went wrong!';
+			$msg = 'something went wrong!';
 		}
-  	$this->view->render($data, ['theme' => 'no']);
+		$this->view->page(200,$msg);
   }
 }
 

@@ -15,5 +15,7 @@ config.server.php
 pub/assets
 pub/files/resume.pdf
 pub/ico
+pub/img
 views/home/about.php
 views/home/contact.php
+unused

@@ -90,6 +90,7 @@ class ResizeImage
     imagecopyresampled($new_image, $this->image, 0, 0, 0, 0, $width, $height, $this->getWidth(), $this->getHeight());
     $this->image = $new_image;
   }
+
   function store($array_pics,$arg = array())
   {
     $default = array(
@@ -104,14 +105,18 @@ class ResizeImage
       'quality' => '80')
     ));
     $arg = array_merge($default,$arg);
-    dump($arg);
 
     $c = count($array_pics);
     for ($i = 0; $i < $c; $i++)
     {
       if ($array_pics[$i])
       {
-        $name = $arg['filename'].'-'.$i.'-';
+
+        if ($arg['filename'] === 'original') {
+          $name = substr($_FILES['pics']['name'][$i], 0,-4);
+        }else {
+          $name = $arg['filename'].'-'.$i.'-';
+        }
         $path = PUB.$arg['path'].$name;
         $this->picsstr[] = $name; // builds the array
 
@@ -123,9 +128,10 @@ class ResizeImage
           $this->{$arg['sizes'][$x]['type']}($arg['sizes'][$x]['size']);
           $this->save($path.$arg['sizes'][$x]['name'].$arg['IMG'], $arg['sizes'][$x]['quality']);
           $files = $path.$arg['sizes'][$x]['name'].$arg['IMG'];
-        }
-      }
-    }
+        } // end of for sizes loop
+        move_uploaded_file($array_pics[$i], $path.$arg['IMG']); // original
+      } // end of if empty check
+    } // end of for files loop
   }
   function getArrayPath()
   {

@@ -9,7 +9,7 @@ function content($data){
 extract($data);
 ?>
 	<div class="container">
-		<form class="form-signin well" action='lost' method='post'>
+		<form class="form-signin well" action='' method='post'>
 			<h2 class="form-signin-heading">User lost</h2>
 			<input type='text' size='20' class="form-control" placeholder="type email here" name='email' value='<?echo $email?>' title='6 to 20 characters minimum'>
 			<br>

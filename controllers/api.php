@@ -7,7 +7,7 @@ class Api
 	function __construct()
 	{
 		$this->db = new Database();
-		$this->Loggedin(7);
+    if ($this->_hasAccess(7) !== true) { $this->view->page(404); }
 	}
 	public function get($data)
 	{
@@ -86,7 +86,7 @@ class Api
       return true;
     } else {
     	$view = new View();
-      $view->error(1337, 'no access, from api');
+      $view->page(1337, 'no access, from api');
     }
   }
   function limit()

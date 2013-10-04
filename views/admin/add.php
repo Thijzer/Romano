@@ -23,7 +23,7 @@ extract($data);
       <input type='checkbox' name='public' /> Post Public // else it's kept in draft
     </p>
     <p>
-      <input type='submit' name='post' value='add Post'/>
+      <input type='submit' name='post' value='Add Post'/>
     </p>
   </form>
 </div>
