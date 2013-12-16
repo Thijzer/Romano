@@ -1,0 +1,24 @@
+{
+    "name": "Thijzer/Romano",
+    "type": "library",
+    "description": "Yet Another Micro MVC framework for PHP",
+    "keywords": ["framework"],
+    "homepage": "http://thijzer.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Thijs De Paepe",
+            "email": "Thijs.dp@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "require-dev": {
+        "phpdocumentor/phpdocumentor": "*",
+        "phpunit/phpunit": "*"
+    },
+    "autoload": {
+        "psr-0": { "Romano\\": "src/" }
+    }
+}
