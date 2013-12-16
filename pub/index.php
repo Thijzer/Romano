@@ -1,10 +1,7 @@
 <?php
-define(TIME, microtime(true));
-
-function timestamp($i = 5)
-{
- return (float)substr(microtime(true) - TIME ,0,(int)$i) * 1000;
-}
+/*
+* our public index
+*/
 session_start();
 require ('../config.php');
-?>
+New Route(str_replace('?'. $_SERVER['QUERY_STRING'], "", $_SERVER['REQUEST_URI']), Config::$array['PATH']);
