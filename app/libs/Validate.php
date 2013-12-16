@@ -1,14 +1,15 @@
 <?php
 /*
-* Validation library 11/2013
-* --------------------------
-* creator/source : Alex Garrett
-* - added regex
-* - decoupled
-* - CheckDB method
-*
-* dependencies : needs DB layer/wrapper for "checkDB"
-*/
+  * Validation library 11/2013
+  * --------------------------
+  * creator/source : Alex Garrett
+  * - added regex
+  * - decoupled
+  * - CheckDB method
+  * - gate system for less validations
+  *
+  * dependencies : needs DB layer/wrapper for "checkDB"
+  */
 class Validate
 {
   private $gate;
@@ -51,7 +52,7 @@ class Validate
               break;
             case 'db':
               if (is_array($rule_value)) {
-                $this->checkDB($rule_value, $item, $value);
+                $this->checkDB($rule_value, strtolower($item), strtolower($value));
               }
               break;
             default:
@@ -67,7 +68,7 @@ class Validate
   }
   public function checkDB($array, $where_key, $where_val)
   {
-    if ($result = DB::connect($array['table'])->get(array($where_key => strtolower($where_val)))->fetch() ) {
+    if ($result = DB::connect($array['table'])->get(array($where_key => $where_val))->fetch() ) {
       foreach ($array as $key => $value) {
         switch ($key) {
           case 'unique':
@@ -83,6 +84,9 @@ class Validate
             }
             break;        
         }
+      }
+      if (!$this->errors) {
+        $this->data[$where_key] = $where_val;
       }
     }
   }

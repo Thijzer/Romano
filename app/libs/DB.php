@@ -37,29 +37,29 @@ class DB extends PDO
    */
   protected $fetchMode = PDO::FETCH_ASSOC;
 
+  /**
+   * constructs the connection.
+   *
+   * throws an error if needed with message if your in development mode.
+   */
   function __construct()
   {    
-    if (DEV_ENV === true) {
-      $options = array(PDO::ATTR_EMULATE_PREPARES, false, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
-    }
+    $options = array(PDO::ATTR_EMULATE_PREPARES, false, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
     try {
       parent::__construct(Config::$array['DB']['DSN'],Config::$array['DB']['USER'],Config::$array['DB']['PASS'],$options); 
     } catch (PDOException $e) {
-        throw $e;
-    } catch(Exception $e) {
-        throw $e;
+      if (DEV_ENV === true) {
+        $message = $e->getMessage();
+      }
+      throw view::page('500','PDO ERROR: '. $message);
     }
   }
-  static function connect($table = '')
-  {
-      static::$instance = new self();
-      static::$instance->table($table);
-      return static::$instance;
-  }
-  public function table($table)
-  {
-    $this->table = $table;
-  }
+
+  /**
+   * some standard arguments we use.
+   *
+   * returns an array
+   */
   protected function arguments($arg)
   {
     return array_merge(array(
@@ -69,6 +69,12 @@ class DB extends PDO
       'limit' => 50
       ), $arg);
   }
+
+  /**
+   * assembles the queries.
+   *
+   * returns an array with query and separated values
+   */
   protected function action($array, $arg)
   {
     if ($i = count($array)) {
@@ -85,8 +91,13 @@ class DB extends PDO
       }
       return array('query' => $query, 'values' => $values); 
     }
-    return false;
   }
+
+  /**
+   * prepares the statement and processes the values  
+   *
+   * returns the object if stamement is something
+   */
   protected function process($sql, $params)
   {
     $this->stmt = null;
@@ -99,12 +110,21 @@ class DB extends PDO
         return $this;
       }
     }
-    return false;
   }
   /*
   * public functions 
   */
-  function get($where, $arg = array() )
+  static function connect($table = '')
+  {
+    static::$instance = new self();
+    static::$instance->table($table);
+    return static::$instance;
+  }
+  public function table($table)
+  {
+    $this->table = $table;
+  }
+  public function get($where, $arg = array() )
   {
     $action = $this->action($where, $arg = $this->arguments($arg + array('split' => ' AND ' )) );
     $sql = "SELECT {$arg['field']} FROM {$this->table} WHERE {$action['query']}";
@@ -112,7 +132,7 @@ class DB extends PDO
       return $this;
     }
   }
-  function delete($where, $arg = array() )
+  public function delete($where, $arg = array() )
   {
     $action = $this->action($where, $arg = $this->arguments($arg + array('split' => ' AND ' )) );
     $sql = "DELETE {$arg['field']} FROM {$this->table} WHERE {$action['query']}";
@@ -120,7 +140,7 @@ class DB extends PDO
       return $this;
     }
   }
-  function insert($fields, $arg = array() )
+  public function insert($fields, $arg = array() )
   {
     $action = $this->action($fields, $arg = $this->arguments($arg) );
     $sql = "INSERT INTO {$this->table} (`" . implode('`, `', array_keys($action['values'])) . "`) VALUES (:". implode(', :', array_keys($action['values'])) .")";
@@ -128,7 +148,7 @@ class DB extends PDO
       return true;
     }
   }
-  function update($fields, $id, $arg = array() )
+  public function update($fields, $id, $arg = array() )
   {
     $action = $this->action($fields, $arg = $this->arguments($arg + array('split' => '`, `')) );
     $sql = "UPDATE {$this->table} SET {$action['query']} WHERE `uid` = {$id}";
@@ -136,7 +156,7 @@ class DB extends PDO
       return true;
     } 
   }
-  function save($fields, $id, $arg = array() )
+  public function save($fields, $id, $arg = array() )
   {
     if (!$this->update($fields, $id, $arg)) {
       $this->insert($fields, $arg);

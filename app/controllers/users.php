@@ -22,13 +22,13 @@ class Users
         ),
         'email' => array(
           'required' => true,
-          'min' => 2,
+          'min' => 5,
           'db' => array('table' => 'users', 'unique' => true)
             
       )));
       if (!$validation->errors() ) {
         $fields = array(
-          'username'  => strtolower($validation->getField('username')),
+          'username'  => $validation->getField('username'),
           'password'  => Crypt::toSalt($validation->getField('password')),
           'email'     => $validation->getField('email'),
           'reset'     => Crypt::randomPlus()
