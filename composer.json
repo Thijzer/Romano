@@ -1,5 +1,5 @@
 {
-    "name": "Thijzer/Romano",
+    "name": "thijzer/romano",
     "type": "library",
     "description": "Yet Another Micro MVC framework for PHP",
     "keywords": ["framework"],
@@ -19,6 +19,6 @@
         "phpunit/phpunit": "*"
     },
     "autoload": {
-        "psr-0": { "Romano\\": "src/" }
+        "psr-0": { "Romano": "src/" }
     }
 }
