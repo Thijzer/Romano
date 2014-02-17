@@ -47,8 +47,9 @@ class DB extends \PDO
       'field' => '*',
       'operator' => '=',
       'order' => '1',
-      'limit' => 50
+      'limit' => 100
       );
+ 
   /**
    * constructs the connection.
    *
@@ -108,6 +109,7 @@ class DB extends \PDO
       }
     }
   }
+
   /*
   * public functions 
   */
@@ -117,10 +119,12 @@ class DB extends \PDO
     static::$instance->table($table);
     return static::$instance;
   }
+
   public function table($table)
   {
     $this->table = $table;
   }
+
   public function get($where, $arg = array() )
   {
     $action = $this->action($where, $arg = array_merge($this->arguments, $arg + array('split' => ' AND ' )) );
@@ -129,6 +133,7 @@ class DB extends \PDO
       return $this;
     }
   }
+
   public function delete($where, $arg = array() )
   {
     $action = $this->action($where, $arg = array_merge($this->arguments, $arg + array('split' => ' AND ' )) );
@@ -137,6 +142,7 @@ class DB extends \PDO
       return $this;
     }
   }
+
   public function insert($fields, $arg = array() )
   {
     $action = $this->action($fields, $arg = array_merge($this->arguments, $arg) );
@@ -145,6 +151,7 @@ class DB extends \PDO
       return true;
     }
   }
+
   public function update($fields, $id, $arg = array() )
   {
     $action = $this->action($fields, $arg = array_merge($this->arguments, $arg + array('split' => '`, `')) );
@@ -153,12 +160,14 @@ class DB extends \PDO
       return true;
     } 
   }
+
   public function save($fields, $id, $arg = array() )
   {
     if (!$this->update($fields, $id, $arg)) {
       $this->insert($fields, $arg);
     }
   }
+
   /*
   * the following methods are extensions of the PDO class
   */
@@ -166,6 +175,7 @@ class DB extends \PDO
   {
     return $this->stmt->fetch($fetchMode);
   }
+
   public function fetchAll()
   {
     return $this->stmt->fetchAll($fetchMode);
