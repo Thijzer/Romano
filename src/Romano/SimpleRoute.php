@@ -1,5 +1,20 @@
 <?php
 
+/**
+* SimpleRoute is
+* a very small but powerful class
+* it's mostly called before anything else and will find it's direction based on the URL path it's given.
+* 
+* It will look for dynamic pages in the CONTROLLER or static ones in VIEW
+* if nothing is found a 404 will be rendered
+*
+* to find its path, its splits the url up into sections, 1 for controller, 2 for method for dynamic pages
+* or 1 for folder and 2 for file in static, also unnamed index will be found.
+* controller methods who start with _ are ignored
+*
+* dependencies : View class and GLOBALS : VIEW + CONTROLLER
+* @author Thijs De Paepe <thijs.depaepe@wijs.be>
+**/
 
 class SimpleRoute
 {
@@ -46,7 +61,8 @@ class SimpleRoute
           $init->{$this->r['method']}($this->r);
           exit();
         }
-    } 
+    }
+
     if (file_exists (VIEW.$this->r['path'].EXT) && empty($this->r['section'][2]) ) {
       View::render($this->r);
     } else {
