@@ -20,18 +20,19 @@ class SimpleRoute
 {
   var $r = array();
 
-  function __construct($url, $paths)
+  function __construct()
   {
-
+    $url = str_replace('?'. $_SERVER['QUERY_STRING'], "", $_SERVER['REQUEST_URI']);
     // count,trim, dissect the given url into sections, 1 ctrlr / 2 method
-    $pos = count($section = list($ctrlr, $method) = explode('/', $url = trim($url,'/')));
+    $pos = count($section = list($ctrlr, $method) = explode('/', $url = trim($url, '/')));
  
-    // find the missing values first = nothing = home/index ,2nd find physical index and last we latch on a home as ctrlr.
+    // find the missing values first = nothing = home/index,
+    // 2nd find physical index and last we latch on a home as ctrlr.
     if (!$method)
     {
       if (!$ctrlr) {
         $ctrlr = 'home'; $method = 'index';
-      } elseif (file_exists(VIEW.$ctrlr.'/index.php')) {
+      } elseif (file_exists(VIEW . $ctrlr . '/index.php')) {
         $method = 'index';
       } else {
         $method = $ctrlr; $ctrlr = 'home';
@@ -48,25 +49,22 @@ class SimpleRoute
       'path' => $ctrlr . '/' . $method
     );
 
-    $this->autoRoute();
-  }
-
-  private function autoRoute()
-  {
-    if (file_exists (CONTROLLER.$this->r['controller'].EXT) ) {
-        require (CONTROLLER.$this->r['controller'].EXT);
-        $class = ucfirst($this->r['controller']);
-        $init = new $class();
-        if (method_exists($init, $this->r['method']) && $this->r['method'][0] !== '_') {
-          $init->{$this->r['method']}($this->r);
-          exit();
-        }
+    if (file_exists (CONTROLLER.$this->r['controller'] .'.php') ) {
+      require (CONTROLLER.$this->r['controller'] .'.php');
+      $class = ucfirst($this->r['controller']);
+      $init = new $class();
+      if (method_exists($init, $this->r['method']) && $this->r['method'][0] !== '_') {
+        $init->{$this->r['method']}($this->r);
+        exit();
+      }
     }
 
-    if (file_exists (VIEW.$this->r['path'].EXT) && empty($this->r['section'][2]) ) {
+    if (file_exists (VIEW . $this->r['path'] .'.php') AND empty($this->r['section'][1]) ) {
       View::render($this->r);
-    } else {
-      View::page(404,'from Route');
+    }
+    else
+    {
+      View::page(404,'error');
     }
   }
 }
