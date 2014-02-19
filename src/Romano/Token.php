@@ -6,7 +6,7 @@ class Token
 {	
 	public static function generate()
 	{
-		return Session::put(Config::$array['session']['token'], md5(uniqid()));
+		return Session::set(Config::$array['session']['token'], md5(uniqid()));
 	}
 	public static function check($token)
 	{

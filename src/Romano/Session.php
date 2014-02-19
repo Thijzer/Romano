@@ -11,7 +11,7 @@
 */
 class Session
 {
-  public static function put($array)
+  public static function set($array)
   {
     foreach ($array as $key => $value) {
       if (!empty($value)) { $_SESSION[$key] = $value; }

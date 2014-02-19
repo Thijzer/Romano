@@ -75,7 +75,7 @@ class DB extends \PDO
    */
   protected function action($array, $arg)
   {
-    if ($i = count($array)) {
+    if ($i = count($array) AND is_array($array) ) {
       $query = null;
       $values = array();
       $x = 1;
@@ -89,6 +89,7 @@ class DB extends \PDO
       }
       return array('query' => $query, 'values' => $values); 
     }
+    //$this->errorlog('DB call not correctly formed we need an array');
   }
 
   /**

@@ -12,7 +12,6 @@
 * modification date   : 12/2013
 */
 
-namespace Romano;
 
 class Input 
 {
