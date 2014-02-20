@@ -12,7 +12,6 @@
 * modification date   : 12/2013
 */
 
-
 class Input 
 {
   public static function exists($type = 'post')
