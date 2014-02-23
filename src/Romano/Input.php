@@ -5,7 +5,8 @@
 * -------------
 * creator/source : Alex Garrett
 * - added auto-escape to the get func
-* - decoupled
+* - decoupled the class
+* - less hardcoding
 *
 * creation date       : 11/2013
 * dependencies        : none

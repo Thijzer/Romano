@@ -24,4 +24,11 @@ class View
   {
     if ($_SESSION['current_location'] !== url) { $_SESSION['last_location'] = $_SESSION['current_location']; $_SESSION['current_location'] = url;}
   }
+  public static function twig($string , array $data)
+  {
+    $loader = new Twig_Loader_Filesystem(VIEW);
+    $twig = new Twig_Environment($loader, array('debug' => true, 'cache' => CACHE));
+    echo $twig->render($string, $data);
+    echo timestamp(2); self::track();
+  }
 }
