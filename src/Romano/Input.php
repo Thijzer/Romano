@@ -10,7 +10,7 @@
 *
 * creation date       : 11/2013
 * dependencies        : none
-* modification date   : 12/2013
+* modification date   : 2/2014
 */
 
 class Input 
@@ -23,6 +23,20 @@ class Input
         break;
       case 'get':
         return (!empty($_GET)) ? true: false;
+        break;    
+      default:
+        return false;
+        break;
+    }
+  }
+  public static function submitted($type = 'post')
+  {
+    switch ($type) {
+      case 'post':
+        return (!isset($_POST)) ? true: false;
+        break;
+      case 'get':
+        return (!isset($_GET)) ? true: false;
         break;    
       default:
         return false;

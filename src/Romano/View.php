@@ -28,7 +28,8 @@ class View
   {
     $loader = new Twig_Loader_Filesystem(VIEW);
     $twig = new Twig_Environment($loader, array('debug' => true, 'cache' => CACHE));
+    $twig->addGlobal("session", $_SESSION);
+    $twig->addGlobal("site", site);
     echo $twig->render($string, $data);
-    echo timestamp(2); self::track();
   }
 }
