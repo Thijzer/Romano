@@ -15,47 +15,31 @@
 
 class Input 
 {
-  public static function exists($type = 'post')
+  public static function submitted($input = null)
   {
-    switch ($type) {
-      case 'post':
-        return (!empty($_POST)) ? true: false;
-        break;
-      case 'get':
-        return (!empty($_GET)) ? true: false;
-        break;    
-      default:
-        return false;
-        break;
+    if (!empty($_POST[$input]) OR !empty($_POST))
+    {
+      return true;
+    }
+    elseif (!empty($_GET[$input]) OR !empty($_GET))
+    {
+      return true;
     }
   }
-  public static function submitted($type = 'post')
+
+  public static function get($input, $escape = 'yes')
   {
-    switch ($type) {
-      case 'post':
-        return (!isset($_POST)) ? true: false;
-        break;
-      case 'get':
-        return (!isset($_GET)) ? true: false;
-        break;    
-      default:
-        return false;
-        break;
-    }
-  }
-  public static function get($value, $escape = 'yes')
-  {
-    if (isset($_POST[$value])) {
-      $value = $_POST[$value];
-    } elseif (isset($_GET[$value])) {
-      $value = $_GET[$value];
+    if (isset($_POST[$input])) {
+      $input = $_POST[$input];
+    } elseif (isset($_GET[$input])) {
+      $input = $_GET[$input];
     } else {
-      $value = '';
+      $input = '';
     }
-    if ($escape !== 'no' AND $value !== '') {
-      $value = self::escape($value);
+    if ($escape !== 'no' AND $input !== '') {
+      $input = self::escape($input);
     }
-    return $value;
+    return $input;
   }
   public static function escape($string)
   {
