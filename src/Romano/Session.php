@@ -13,16 +13,19 @@ class Session
 {
   public static function set($array)
   {
-    foreach ($array as $key => $value) {
-      if (!empty($value)) { $_SESSION[$key] = $value; }
+    foreach ($array as $key => $value)
+    {
+      if (!empty($value)) $_SESSION[$key] = $value;
     }
   }
+
   public static function get($name)
   {
     return $_SESSION[$name];
   }
+
   public static function delete($name)
   { 
-    if (self::get($name)) { unset($_SESSION[$name]); }
+    if (self::get($name)) unset($_SESSION[$name]);
   }
 }
