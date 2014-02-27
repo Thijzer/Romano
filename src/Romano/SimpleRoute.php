@@ -59,8 +59,8 @@ class SimpleRoute
       }
     }
 
-    if (file_exists (VIEW . $this->r['path'] .'.php') AND empty($this->r['section'][1]) ) {
-      View::render($this->r);
+    if (file_exists (VIEW . $this->r['path'] .'.twig') AND empty($this->r['section'][1]) ) {
+      View::twig($this->r['path'] . '.twig', array('content' => $this->r));
     }
     else
     {
