@@ -55,6 +55,7 @@ class DB extends \PDO
    *
    * throws an error if needed with message if your in development mode.
    */
+
   function __construct()
   {    
     $options = array(\PDO::ATTR_EMULATE_PREPARES, false, \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION);
