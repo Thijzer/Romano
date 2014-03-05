@@ -20,6 +20,7 @@ class Validate
   public function check($source, $items = array() )
   {
     foreach ($items as $item => $rules) {
+
       $this->gate = true;
       foreach ($rules as $rule => $rule_value) {
         $value = trim($source[$item]);
