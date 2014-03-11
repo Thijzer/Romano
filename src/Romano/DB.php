@@ -11,31 +11,16 @@ class DB extends \PDO
 {
 
   /**
-   * The current globally used instance.
+   * The current globals
    *
    * @var 
    */
   protected static $instance = null;
-
-  /**
-   * The statement object for prepared queries.
-   *
-   * @var 
-   */
   protected $stmt;
-
-  /**
-   * The affeced table we will be working on.
-   *
-   * @var 
-   */
   protected $table;
-
-  /**
-   * The default fetch mode of the connection.
-   *
-   * @var int
-   */
+  protected $where  = false;
+  protected $query = false;
+  protected $options = array(\PDO::ATTR_EMULATE_PREPARES, false, \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION);
   protected $fetchMode = \PDO::FETCH_ASSOC;
 
  /**
@@ -43,6 +28,7 @@ class DB extends \PDO
    *
    * array
    */
+  protected $params;
   protected $arguments = array(
       'field' => '*',
       'operator' => '=',
@@ -58,13 +44,10 @@ class DB extends \PDO
 
   function __construct()
   {    
-    $options = array(\PDO::ATTR_EMULATE_PREPARES, false, \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION);
     try {
-      parent::__construct(\Config::$array['DB']['DSN'],\Config::$array['DB']['USER'],\Config::$array['DB']['PASS'],$options); 
+      parent::__construct(\Config::$array['DB']['DSN'],\Config::$array['DB']['USER'],\Config::$array['DB']['PASS'],$this->options); 
     } catch (\PDOException $e) {
-      if (DEV_ENV === true) {
-        $message = $e->getMessage();
-      }
+      if (DEV_ENV === true) $message = $e->getMessage();
       throw View::page('500','PDO ERROR: '. $message);
     }
   }
@@ -78,19 +61,22 @@ class DB extends \PDO
   {
     if ($i = count($array) AND is_array($array) ) {
       $query = null;
-      $values = array();
+      
       $x = 1;
+
       foreach ($array as $key => $value) {
-        $query .= "`{$key}` {$arg['operator']} :{$key}";
+        
+        $query .= "`{$key}` {$arg['operator']} ";
+        ($arg['operator'] == 'LIKE CONCAT' ? $query .= "('%', :{$key}, '%')": $query .= ":{$key}");
         if ($x < $i) {
           $query .= $arg['split'];
           $x++;
         }
-        $values[$key] = $value;
+        $this->params[$key] = $value;
       }
-      return array('query' => $query, 'values' => $values); 
+      
+      return array('query' => $query); 
     }
-    //$this->errorlog('DB call not correctly formed we need an array');
   }
 
   /**
@@ -112,6 +98,22 @@ class DB extends \PDO
     }
   }
 
+  public function setQuery($sqlValue)
+  {
+    if (!$this->query) $this->query = (string) $sqlValue;
+    return $this;
+  }
+
+  private function setWhere($whereValue, $arg)
+  {
+    if ($this->where === true) {
+      $this->query .= $arg['split'] . (string) $whereValue;
+    } else {
+      $this->where = true;
+      $this->query .= ' WHERE ' . (string) $whereValue;
+    }
+  }
+
   /*
   * public functions 
   */
@@ -127,40 +129,52 @@ class DB extends \PDO
     $this->table = $table;
   }
 
-  public function get($where, $arg = array() )
+  public function select($fields)
   {
-    $action = $this->action($where, $arg = array_merge($this->arguments, $arg + array('split' => ' AND ' )) );
-    $sql = "SELECT {$arg['field']} FROM {$this->table} WHERE {$action['query']}";
-    if ($this->process($sql, $action['values']) ) {
-      return $this;
+    if($this->query) {
+      $this->query = str_replace('*', implode(', ', (array) ($fields)), $this->query);
+    } else {
+      $this->arguments['field'] = (array) $fields;
     }
+    return $this;
+  }
+
+
+  public function where($where, $arg = array() )
+  {
+    $action = $this->action((array) $where, $arg = array_merge($this->arguments, $arg + array('split' => ' AND ' )) );
+    $this->setQuery("SELECT {$arg['field']} FROM {$this->table}");
+    $this->setWhere($action['query'], $arg);
+    return $this;
+  }
+
+  public function like($where)
+  {
+    return $this->where($where, array('operator' => 'LIKE CONCAT'));
   }
 
   public function delete($where, $arg = array() )
   {
     $action = $this->action($where, $arg = array_merge($this->arguments, $arg + array('split' => ' AND ' )) );
-    $sql = "DELETE {$arg['field']} FROM {$this->table} WHERE {$action['query']}";
-    if ($this->process($sql, $action['values']) ) {
-      return $this;
-    }
+    $this->setQuery("DELETE {$arg['field']} FROM {$this->table}");
+    $this->setWhere($action['query'], $arg);
+    return $this;
   }
 
   public function insert($fields, $arg = array() )
   {
     $action = $this->action($fields, $arg = array_merge($this->arguments, $arg) );
-    $sql = "INSERT INTO {$this->table} (`" . implode('`, `', array_keys($action['values'])) . "`) VALUES (:". implode(', :', array_keys($action['values'])) .")";
-    if ($this->process($sql, $action['values']) ) {
-      return true;
-    }
+    $this->setQuery("INSERT INTO {$this->table} (`" . implode('`, `', array_keys($action['values'])) . "`) VALUES (:". implode(', :', array_keys($action['values'])) .")");
+    $this->setWhere($action['query'], $arg);
+    return true;
   }
 
   public function update($fields, $id, $arg = array() )
   {
     $action = $this->action($fields, $arg = array_merge($this->arguments, $arg + array('split' => '`, `')) );
-    $sql = "UPDATE {$this->table} SET {$action['query']} WHERE `uid` = {$id}";
-    if ($this->process($sql, $action['values']) ) {
-      return true;
-    } 
+    $sql = "UPDATE {$this->table} SET {$action['query']}";
+    $this->setWhere($action['query'], $arg);
+    return true;
   }
 
   public function save($fields, $id, $arg = array() )
@@ -175,11 +189,32 @@ class DB extends \PDO
   */
   public function fetch()
   {
-    return $this->stmt->fetch($fetchMode);
+    if ($this->process($this->query, $this->params) ) return $this->stmt->fetch($this->fetchMode);
   }
 
   public function fetchAll()
   {
-    return $this->stmt->fetchAll($fetchMode);
+    if ($this->process($this->query, $this->params) ) return $this->stmt->fetchAll($this->fetchMode);
+  }
+
+  public function fetchPairs()
+  {
+    if ($result = $this->fetch()) return array(reset($result) => end($result));
+  }
+
+  public function fetchValues($limiter = ', ')
+  {
+    if ($result = $this->fetch()) return implode($limiter, array_values($result));
+  }
+
+  public function fetchJson()
+  {
+    if ($result = $this->fetch()) return json_encode($result);
+  }
+
+  public function build()
+  {
+
+    return array('query' => $this->query, 'params' => $this->params);
   }
 }
