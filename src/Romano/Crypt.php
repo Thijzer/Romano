@@ -28,7 +28,7 @@ class Crypt
   }
   static function token()
   {
-    return Session::put(Config::$array['session']['token'], md5(uniqid()));
+    return Session::put(Config::$array['session']['token'], self::unique());
   }
   static function check($token)
   {
@@ -39,5 +39,9 @@ class Crypt
       return true;
     }
     return false;
+  }
+  static function unique()
+  {
+    return self::md5(uniqid() . microtime(TRUE) . mt_rand());
   }
 }

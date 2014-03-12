@@ -9,25 +9,25 @@
 
 class DB extends \PDO
 {
+  /**
+   * @var bool
+   */
+  protected $where  = false;
 
   /**
-   * The current globals
-   *
-   * @var 
+   * @var string
    */
-  protected static $instance = null;
   protected $stmt;
   protected $table;
-  protected $where  = false;
-  protected $query = false;
+  protected $fields;
+  protected $query = null;
   protected $options = array(\PDO::ATTR_EMULATE_PREPARES, false, \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION);
   protected $fetchMode = \PDO::FETCH_ASSOC;
 
  /**
-   * some standard arguments we use.
-   *
-   * array
+   * @var array
    */
+  protected static $instance = null;
   protected $params;
   protected $arguments = array(
       'field' => '*',
@@ -41,7 +41,6 @@ class DB extends \PDO
    *
    * throws an error if needed with message if your in development mode.
    */
-
   function __construct()
   {    
     try {
@@ -92,9 +91,9 @@ class DB extends \PDO
         foreach ($params as $key => $param) {
           $this->stmt->bindvalue(':'.$key, $param);
         }
-        $this->stmt->execute();
-        return $this;
       }
+      $this->stmt->execute();
+      return $this;
     }
   }
 
@@ -129,16 +128,19 @@ class DB extends \PDO
     $this->table = $table;
   }
 
-  public function select($fields)
+  public function select($fields = null)
   {
-    if($this->query) {
-      $this->query = str_replace('*', implode(', ', (array) ($fields)), $this->query);
-    } else {
-      $this->arguments['field'] = (array) $fields;
+    $this->fields = $fields;
+    if($this->query AND is_array($this->fields)) {
+      $this->query = str_replace('*', implode(', ', $this->fields), $this->query);
+    } elseif (is_array($this->fields)) {
+      $this->setQuery('SELECT '. implode(', ', $this->fields) . " FROM {$this->table}");
+    }
+    elseif (!$this->query) {
+      $this->setQuery("SELECT {$this->arguments['field']} FROM {$this->table}");
     }
     return $this;
   }
-
 
   public function where($where, $arg = array() )
   {
@@ -189,12 +191,12 @@ class DB extends \PDO
   */
   public function fetch()
   {
-    if ($this->process($this->query, $this->params) ) return $this->stmt->fetch($this->fetchMode);
+    if ($this->process($this->query, $this->params)) return $this->stmt->fetch($this->fetchMode);
   }
 
   public function fetchAll()
   {
-    if ($this->process($this->query, $this->params) ) return $this->stmt->fetchAll($this->fetchMode);
+    if ($this->process($this->query, $this->params)) return $this->stmt->fetchAll($this->fetchMode);
   }
 
   public function fetchPairs()
@@ -212,9 +214,47 @@ class DB extends \PDO
     if ($result = $this->fetch()) return json_encode($result);
   }
 
+  public function fetchRss()
+  {
+    header("Content-Type: application/xml; charset=ISO-8859-1");
+
+  }
+
   public function build()
   {
-
     return array('query' => $this->query, 'params' => $this->params);
+  }
+
+  public function fetchCsv($name = NULL)
+  {
+    $this->Csv($this->fetchAll(), $name);
+  }
+
+  public function Csv($results, $name = NULL)
+  {
+    $outstream = fopen("php://output", "w");
+
+    // create filename
+    if(!$name) {
+      $name = md5(uniqid() . microtime(TRUE) . mt_rand()) . '.csv';
+    }
+
+    // headers for CSV
+    header('Content-Type: text/csv');
+    header('Content-Disposition: attachment; filename='. $name);
+    header('Pragma: no-cache');
+    header("Expires: 0");
+
+    //create collum names
+    foreach ($results[0] as $key => $value) {
+      $keys[] = $key;
+    }
+    fputcsv($outstream, $keys);
+
+    //create collum records
+    foreach($results as $key => $result) {
+      fputcsv($outstream, $result);
+    }
+    fclose($outstream);
   }
 }
