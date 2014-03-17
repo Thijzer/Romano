@@ -11,135 +11,177 @@ class Query
    * @var string
    */
   protected $table;
-  protected $fields;
   protected $query = null;
 
  /**
    * @var array
    */
+  protected $settings = array('namedParams' => true);
   protected $params;
   protected $arguments = array(
-      'field' => '*',
-      'operator' => '=',
+      'operator' => ' = ',
       'order' => '1',
-      'limit' => 100
+      'limit' => 100,
+      'split' => 'AND'
       );
-
-	/**
-	 * @var array
-	 */
-	protected static $instance = null;
  
   /**
    * assembles the queries.
-   *
-   * returns an array with query and separated values
    */
-  private function action($array, $arg)
+  private function assembleQuery($array, $arg)
   {
-    if ($i = count($array) AND is_array($array) ) {
-      $query = null;
-      
-      $x = 1;
+    if (is_array($array)) {
 
+      $query = null;
       foreach ($array as $key => $value) {
-        
-        $query .= "`{$key}` {$arg['operator']} ";
-        ($arg['operator'] == 'LIKE CONCAT' ? $query .= "('%', :{$key}, '%')": $query .= ":{$key}");
-        if ($x < $i) {
-          $query .= $arg['split'];
-          $x++;
+
+ 				if (!empty($value)) {
+
+	        // example: "`id` ="
+	        $query .= '`' . $key . '`' . $arg['operator'];
+
+	        // optional key selection
+	        if($this->settings['namedParams'] ===  true) {
+	        	$param = ':' . $key;
+	        	$this->params[$param] = $value;
+	        } 
+	        else {
+						$this->params[] = $value;
+						$param = '?';
+					}
+
+	        // optional like example: " LIKE CONCAT('%', :id, '%')"
+	        ($arg['operator'] == ' LIKE ' ? $query .= "CONCAT('%', " . $param . ", '%')": $query .= $param);
+
+	        // new line 
+					$query .= "\n";
+
+	        // the last key in the array
+	        if (!$this->last($array, $key)) $query .= ' ' . $arg['split'] . ' ';
         }
-        $this->params[$key] = $value;
       }
-      
-      return array('query' => $query); 
+      return $query;
     }
   }
 
-  public function setQuery($sqlValue)
+  public function setQuery($sqlValue = null)
   {
-    if (!$this->query) $this->query = (string) $sqlValue;
+    if (!$this->query) $this->query = "\n" . (string) $sqlValue . "\n";
     return $this;
   }
 
   private function setWhere($whereValue, $arg)
   {
     if ($this->where === true) {
-      $this->query .= $arg['split'] . (string) $whereValue;
+      $this->query .= ' ' . $arg['split'] . ' ' . (string) $whereValue;
     } else {
       $this->where = true;
       $this->query .= ' WHERE ' . (string) $whereValue;
     }
   }
 
-  static public function table($table)
+  public function endQuery($sqlValue = null, $arg = array())
   {
-  	static::$instance = new self();
-  	static::$instance->table = $table;
-    return static::$instance;
+    if (!$this->query) return false;
+    $arg = array_merge($this->arguments, $arg);
+    if (!$sqlValue) {
+    	$this->query .= ' ORDER BY ' . $arg['order'] . ' LIMIT ' . $arg['limit'];
+    }
+    else {
+    	$this->query .= (string) $sqlValue;
+    }
+    $this->query .= "\n";
+    return $this;
   }
 
-  public function select($fields = null)
+  static public function select($table = null)
   {
-    $this->fields = $fields;
-    if($this->query AND is_array($this->fields)) {
-      $this->query = str_replace('*', implode(', ', $this->fields), $this->query);
-    } elseif (is_array($this->fields)) {
-      $this->setQuery('SELECT '. implode(', ', $this->fields) . " FROM {$this->table}");
-    }
-    elseif (!$this->query) {
-      $this->setQuery("SELECT {$this->arguments['field']} FROM {$this->table}");
+  	if ((string) $table) {
+  		$instance = Singleton::getInstance(get_class());
+	  	$instance->table = $table;
+	  	$instance->query = 'SELECT * FROM ' . $table;
+      $instance->params = '';
+	    return $instance;
+  	}
+  }
+
+  public function onFields($fields = null)
+  {
+  	$fields = (array) $fields;
+    if($fields) {
+			if ($this->query) {
+				$this->query = str_replace('*', implode(', ', $fields), $this->query);
+			} else {
+				$this->setQuery('SELECT '. implode(', ', $fields) . ' FROM ' . $this->table);
+    	}
+    } 
+    elseif (!$this->query AND !$fields) {
+    	$this->setQuery('SELECT * FROM ' . $this->table);	
     }
     return $this;
   }
 
-  public function where($where, $arg = array() )
+  public function where($where = array(), $arg = array() )
   {
-    $action = $this->action((array) $where, $arg = array_merge($this->arguments, $arg + array('split' => ' AND ' )) );
-    $this->setQuery("SELECT {$arg['field']} FROM {$this->table}");
-    $this->setWhere($action['query'], $arg);
+  	$this->setQuery('SELECT * FROM ' . $this->table);
+    $query = $this->assembleQuery((array) $where, $arg = array_merge($this->arguments, $arg) );
+    $this->setWhere($query, $arg);
     return $this;
   }
 
-  public function like($where)
+  public function like($where = array())
   {
-    return $this->where($where, array('operator' => 'LIKE CONCAT'));
+    return $this->where($where, array('operator' => ' LIKE '));
   }
 
-  public function delete($where, $arg = array() )
+  public function delete($where = array(), $arg = array() )
   {
-    $action = $this->action($where, $arg = array_merge($this->arguments, $arg + array('split' => ' AND ' )) );
-    $this->setQuery("DELETE {$arg['field']} FROM {$this->table}");
-    $this->setWhere($action['query'], $arg);
+  	$this->setQuery('DELETE * FROM ' . $this->table);
+    $query = $this->assembleQuery((array) $where, $arg = array_merge($this->arguments, $arg) );
+    $this->setWhere($query, $arg);
     return $this;
   }
 
-  public function insert($fields, $arg = array() )
+  public function insert($fields = array(), $arg = array() )
   {
-    $action = $this->action($fields, $arg = array_merge($this->arguments, $arg) );
-    $this->setQuery("INSERT INTO {$this->table} (`" . implode('`, `', array_keys($action['values'])) . "`) VALUES (:". implode(', :', array_keys($action['values'])) .")");
-    $this->setWhere($action['query'], $arg);
-    return true;
+    $this->assembleQuery((array) $fields, $arg = array_merge($this->arguments, $arg) );
+
+  	$paramKeys = array_keys($this->params);
+    $this->setQuery(
+    	'INSERT INTO ' . $this->table . ' (`' . 
+    	implode('`, `', $paramKeys) . '`) VALUES (:' . 
+    	implode(', :', $paramKeys) . ')'
+    );
+    return $this;
   }
 
-  public function update($fields, $id, $arg = array() )
+  public function update($fields = array(), $arg = array() )
   {
-    $action = $this->action($fields, $arg = array_merge($this->arguments, $arg + array('split' => '`, `')) );
-    $sql = "UPDATE {$this->table} SET {$action['query']}";
-    $this->setWhere($action['query'], $arg);
-    return true;
-  }
-
-  public function save($fields, $id, $arg = array() )
-  {
-    if (!$this->update($fields, $id, $arg)) {
-      $this->insert($fields, $arg);
-    }
+    $query = $this->assembleQuery((array) $fields, $arg = array_merge($this->arguments, $arg + array('split' => ',')) );
+    $this->setQuery('UPDATE ' . $this->table . ' SET ' . $query);
+    return $this;
   }
 
   public function build()
   {
     return array('query' => $this->query, 'params' => $this->params);
   }
+
+  private function last(&$array, $key) {
+    end($array);
+    return $key === key($array);
+  }
 }
+
+      // $query = Query::select('users') //select
+      //   ->setQuery('SELECT * FROM users')
+      //   ->like(array('active' => '1'))
+      //   ->delete(array('active' => '1'), array('split' => 'OR'))
+      //   ->insert(array('active' => '1'))
+      //   ->update(array('active' => '1'))
+      //   ->where(array('active' => '1'))
+      //   ->like(array('uid' => (int) $pid))
+      //   ->onFields(array('username', 'uid'))
+      //   ->build();
+
+      // $results = DB::run($query)->fetchAll();

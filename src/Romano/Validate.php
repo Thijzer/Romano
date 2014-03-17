@@ -69,7 +69,12 @@ class Validate
   }
   public function checkDB($array, $where_key, $where_val)
   {
-    if ($result = DB::connect($array['table'])->get(array($where_key => $where_val))->fetch() ) {
+    $result = DB::run(
+      Query::select($array['table'])
+        ->where(array($where_key => $where_val))
+    )->fetch();
+
+    if ($result) {
       foreach ($array as $key => $value) {
         switch ($key) {
           case 'unique':

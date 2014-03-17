@@ -17,11 +17,6 @@ class DB extends \PDO
   protected $params;
   protected $options = array(\PDO::ATTR_EMULATE_PREPARES, false, \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION);
   protected $fetchMode = \PDO::FETCH_ASSOC;
-
- /**
-   * @var array
-   */
-  protected static $instance = null;
  
   /**
    * constructs the connection.
@@ -29,9 +24,11 @@ class DB extends \PDO
    * throws an error if needed with message if your in development mode.
    */
   function __construct()
-  {    
+  {
+    $DB = App::getInstance()->get(array('config', 'DB'));
+    //dump($DB);exit();
     try {
-      parent::__construct(\Config::$array['DB']['DSN'],\Config::$array['DB']['USER'],\Config::$array['DB']['PASS'],$this->options); 
+      parent::__construct($DB['DSN'],$DB['USER'],$DB['PASS'],$this->options); 
     } catch (\PDOException $e) {
       if (DEV_ENV === true) $message = $e->getMessage();
       throw View::page('500','PDO ERROR: '. $message);
@@ -49,7 +46,7 @@ class DB extends \PDO
     if ($this->stmt = $this->prepare($sql)) {
       if ($params) {
         foreach ($params as $key => $param) {
-          $this->stmt->bindvalue(':'.$key, $param);
+          $this->stmt->bindvalue($key, $param);
         }
       }
       $this->stmt->execute();
@@ -60,16 +57,22 @@ class DB extends \PDO
   /*
   * public functions 
   */
-  static function run($results)
+  static function run($results = array())
   {
-    if (is_array($results)) {
-      static::$instance = new self();
-      static::$instance->query = $results['query'];
-      static::$instance->params = $results['params'];
-      return static::$instance;
+    if (is_array($results)) { 
+      $instance = Singleton::getInstance(get_class());    
+      $instance->query = $results['query'];
+      $instance->params = $results['params'];
+      return $instance;
     }
-    return false;
   }
+
+  // public function save($fields, $arg = array() )
+  // {
+  //   if (!$this->update($fields, $arg)) {
+  //     $this->insert($fields, $arg);
+  //   }
+  // }
 
   /*
   * the following methods are extensions of the PDO class

@@ -1,12 +1,12 @@
 <?php
 
-Class Parser
+Class Parse
 {
   static $rule = array('key' => 'parser_cache'),
-        $content,
-        $single,
-        $regex = array(),
-        $match = array();
+    $content,
+    $single,
+    $regex = array(),
+    $match = array();
 
   static function grab($value)
   {
@@ -15,6 +15,7 @@ Class Parser
       self::$single = new self;
     }
     self::setContent($value, self::$rule['key']);
+
     return self::$single;
   }
   
@@ -105,6 +106,25 @@ Class Parser
   private static function setContent($site, $cache)
   {
     if (!isset(self::$content[$cache])) self::$content[$cache] = file_get_contents(self::$rule[$site]);
+  }
+  public static function smallXml($url = null)
+  {
+    if ($url) {
+      $xml = simplexml_load_file($url);
+
+      function toArray($xml)
+      {
+        $array = json_decode(json_encode($xml), TRUE);
+            
+          foreach ( array_slice($array, 0) as $key => $value ) {
+            if ( empty($value) ) $array[$key] = NULL;
+            elseif ( is_array($value) ) $array[$key] = toArray($value);
+          }
+        return $array;
+      } 
+
+      return toArray($xml);
+    }
   }
 }
 

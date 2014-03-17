@@ -1,18 +1,6 @@
 <?php
 
 /**
-* SimpleRoute is
-* a very small but powerful class
-* it's mostly called before anything else and will find it's direction based on the URL path it's given.
-* 
-* It will look for dynamic pages in the CONTROLLER or static ones in VIEW
-* if nothing is found a 404 will be rendered
-*
-* to find its path, its splits the url up into sections, 1 for controller, 2 for method for dynamic pages
-* or 1 for folder and 2 for file in static, also unnamed index will be found.
-* controller methods who start with _ are ignored
-*
-* dependencies : View class and GLOBALS : VIEW + CONTROLLER
 * @author Thijs De Paepe <thijs.depaepe@wijs.be>
 **/
 
@@ -20,9 +8,15 @@ class SimpleRoute
 {
   var $r = array();
 
-  function __construct()
+  function __construct($app)
   {
+    $app->setting('stamp', 'router', timestamp(2) );
+
     $url = str_replace('?'. $_SERVER['QUERY_STRING'], "", $_SERVER['REQUEST_URI']);
+
+    // find view with a dot in the end
+    list($url, $view) = explode('.', $url);
+
     // count,trim, dissect the given url into sections, 1 ctrlr / 2 method
     $pos = count($section = list($ctrlr, $method) = explode('/', $url = trim($url, '/')));
  
@@ -41,30 +35,31 @@ class SimpleRoute
 
     // now all values are set lets compare against the paths array
     $this->r = array(
-      'method' => $method, 
       'controller' => $ctrlr, 
-      'url' => $url, 
-      'section' => $section, 
-      'pos' => $pos, 
+      'method' => $method, 
+      'uri' => $url,
+      'view' => ($view ? $view : $view = 'twig'), 
+      'parameter' => ($section[2] ? array_splice($section, 2, $pos) : false), 
+      'positions' => $pos, 
       'path' => $ctrlr . '/' . $method
     );
+
+    $app->setArray('route', $this->r);   
 
     if (file_exists (CONTROLLER.$this->r['controller'] .'.php') ) {
       require (CONTROLLER.$this->r['controller'] .'.php');
       $class = ucfirst($this->r['controller']);
       $init = new $class();
       if (method_exists($init, $this->r['method']) && $this->r['method'][0] !== '_') {
-        $init->{$this->r['method']}($this->r);
+        $data = $init->{$this->r['method']}($app);
+        if ($data AND $this->r['view'] != 'twig') Output::{$this->r['view']} ($data, $ctrlr);
         exit();
       }
     }
 
-    if (file_exists (VIEW . $this->r['path'] .'.twig') AND empty($this->r['section'][1]) ) {
-      View::twig($this->r['path'] . '.twig', array('content' => $this->r));
-    }
-    else
-    {
-      View::page(404,'error');
-    }
+    if (file_exists (VIEW . $this->r['path'] . '.twig') AND empty($this->r['controller']) )
+      \View::twig($this->r['path'] . '.twig');
+
+    \View::page(404, 'error');
   }
 }
