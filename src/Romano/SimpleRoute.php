@@ -52,13 +52,15 @@ class SimpleRoute
       $init = new $class();
       if (method_exists($init, $this->r['method']) && $this->r['method'][0] !== '_') {
         $data = $init->{$this->r['method']}($app);
-        if ($data AND $this->r['view'] != 'twig') Output::{$this->r['view']} ($data, $ctrlr);
         exit();
       }
+      if ($this->r['view'] != 'twig') Output::{$this->r['view']} ($data, $ctrlr);
     }
 
-    if (file_exists (VIEW . $this->r['path'] . '.twig') AND empty($this->r['controller']) )
+    if (file_exists (VIEW . $this->r['path'] . '.twig') AND !empty($this->r['controller']) ) {
       \View::twig($this->r['path'] . '.twig');
+      exit();
+    }
 
     \View::page(404, 'error');
   }

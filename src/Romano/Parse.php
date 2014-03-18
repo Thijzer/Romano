@@ -103,13 +103,15 @@ Class Parse
     }
     return $result;
   }
+
   private static function setContent($site, $cache)
   {
     if (!isset(self::$content[$cache])) self::$content[$cache] = file_get_contents(self::$rule[$site]);
   }
+
   public static function smallXml($url = null)
   {
-    if ($url) {
+    if (self::checkUrl($url)) {
       $xml = simplexml_load_file($url);
 
       function toArray($xml)
@@ -124,6 +126,31 @@ Class Parse
       } 
 
       return toArray($xml);
+    }
+  }
+
+  public static function json($url)
+  {
+    if ($url = @file_get_contents(trim($url))) {
+
+      // option self::$http_response_header; // keep save the headers for filetype check and 200 check
+      return json_decode($url, true);
+    }
+  }
+
+  /**
+  * this is a slow but useful tool, 
+  * it's best not to use this to frequent or 
+  * on first if's better rather a if false checkUrl if
+  *
+  * @return boolean 
+  */
+  public static function checkUrl($url = null)
+  {
+    if ($url) {
+      $url = @file_get_contents(trim($url));
+      // option self::$http_response_header; // keep save the headers for filetype check and 200 check
+      return (strpos($http_response_header[0],'200') == true) ? true : false; 
     }
   }
 }

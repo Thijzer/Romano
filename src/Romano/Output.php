@@ -143,4 +143,10 @@ class Output
   {
     if (is_array($results)) echo dump($results);
   }
+
+  public static function dev($results)
+  {
+    if (is_array($results)) echo dump($results);
+    dump( App::getInstance()->getAll() );
+  }
 }

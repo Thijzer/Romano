@@ -25,7 +25,7 @@ class View
   {
     if ($_SESSION['current_location'] !== url) { $_SESSION['previous_location'] = $_SESSION['current_location']; $_SESSION['current_location'] = url;}
   }
-  public static function twig($string , $data)
+  public static function twig($string  = null , $data = null)
   {
     $loader = new Twig_Loader_Filesystem(VIEW);
     $twig = new Twig_Environment($loader, array('debug' => true, 'cache' => CACHE));
