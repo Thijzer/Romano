@@ -1,12 +1,12 @@
 <?php
 
 /**
-* Filter library 
+* Filter library
 * -------------
 * creator/source : Thijs De Paepe
 */
 
-class Filter 
+Class Filter
 {
   private static $foreignChars =  array(
     'from' => array ('ç','æ','œ','á','é','í','ó','ú','à','è','ì','ò','ù','ä','ë','ï','ö','ü','ÿ','â','ê','î','ô','û','å','e','i','ø','u'),
@@ -28,15 +28,15 @@ class Filter
   {
     $characters = array_merge(self::$Chars['markUp'], self::$Chars['specials'], $remove);
     // Convert accented characters, and remove parentheses and apostrophes
-    $input = str_replace ($characters, '', $input);
+    $input = str_replace($characters, '', $input);
 
     // we add the space char
     if ($foreignChars === true) $chars = self::$foreignChars;
 
     $chars['from'][] = ' ';
     $chars['to'][] = $spacer;
-    
+
     // Do the replacements, and convert all foreign characters to their counterparts
-    return strtolower(str_replace ($chars['from'], $chars['to'], trim($input)));
+    return strtolower(str_replace($chars['from'], $chars['to'], trim($input)));
   }
 }

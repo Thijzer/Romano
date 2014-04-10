@@ -28,28 +28,18 @@ class Output
   {
     if(!$filename) $filename = self::uniqueFilename() . '.xml';
 
+
     header('Content-Type: text/xml');
     self::setheader($filename);
-
     $xml = new XMLWriter();
     $xml->openMemory();
     $xml->startDocument('1.0', 'UTF-8');
-
-    self::xml_parse($results, $name);
-  }
-
-  public static function uniqueFilename()
-  {
-  	return md5(uniqid() . microtime(TRUE) . mt_rand());
-  }
-
-  public static function makeKeys($results)
-  {
-  	//create collum names
-    foreach ($results[0] as $key => $result) {
-    	$keys[] = $key;
-    }
-    return $keys;
+    if (empty($results[0])) {
+      foreach ($results as $key => $result) self::xml_parse($xml, $result, $key);
+    } else {
+        self::xml_parse($xml, $results, $name);
+    } 
+    exit();
   }
 
   public static function rss($results, $name = 'rss', $filename = null)
@@ -75,7 +65,12 @@ class Output
      $xml->writeElement( 'pubDate', date("Y-m-d H:i:s") );
     // $xml->writeElement( 'language', $language );
     // $xml->writeElement( 'copyright', $copyright );
-    self::xml_parse($xml, $results, $name);
+    if (empty($results[0])) {
+      foreach ($results as $key => $result) self::xml_parse($xml, $result, $key);
+    } else {
+        self::xml_parse($xml, $results, $name);
+    } 
+    exit();
   }
 
   public static function json($result, $name = 'json', $filename = null)
@@ -112,18 +107,12 @@ class Output
     }
     echo $data;
   }
-  private static function setHeader($filename)
-  {
-    header('Content-Disposition: attachment; filename=' . $filename);
-    header('Pragma: no-cache');
-    header("Expires: 0");    
-  }
 
   private static function xml_parse($xml, $results, $name)
   {
     $xml->startElement($name);    
     foreach($results as $result) {
-        $xml->startElement($name . '_item');
+        $xml->startElement($name . '-item');
         foreach($result as $item_key => $item) {
             $xml->startElement($item_key);
             //$xml->writeAttribute($item_key, $item);
@@ -135,18 +124,40 @@ class Output
     $xml->endElement();
     $xml->endDocument();
     echo $xml->outputMemory(true);
-    $xml->flush();
-    exit();    
+    $xml->flush();  
   }
 
   public static function dump($results)
   {
-    if (is_array($results)) echo dump($results);
+    if (is_array($results) AND DEV_ENV) echo dump($results);
   }
 
   public static function dev($results)
   {
-    if (is_array($results)) echo dump($results);
-    dump( App::getInstance()->getAll() );
+    if(DEV_ENV) {
+      $app = App::getInstance();
+      dump( $app->getAll() );
+    }
+  }
+
+  public static function uniqueFilename()
+  {
+    return md5(uniqid() . microtime(TRUE) . mt_rand());
+  }
+
+  public static function makeKeys($results)
+  {
+    //create collum names
+    foreach ($results[0] as $key => $result) {
+      $keys[] = $key;
+    }
+    return $keys;
+  }
+
+  private static function setHeader($filename)
+  {
+    header('Content-Disposition: attachment; filename=' . $filename);
+    header('Pragma: no-cache');
+    header("Expires: 0");    
   }
 }

@@ -32,6 +32,7 @@ Class App
 
   public function get($name)
   {
+    if (count($name) === 3) return $this->container[$name[0]][$name[1]][$name[2]];
     if (is_array($name)) return $this->container[$name[0]][$name[1]];
     if ($name) return $this->container[$name];
   }

@@ -67,6 +67,14 @@ class Validate
       }
     }
   }
+
+  public function requireAll($source)
+  {
+    foreach ($source as $key => $value) {
+      if (empty($value)) $this->addError($key . ' is required ');
+    }
+  }
+
   public function checkDB($array, $where_key, $where_val)
   {
     $result = DB::run(

@@ -11,15 +11,58 @@
 
 class Crypt
 {
-  static function toSalt($string)
+  static function toSalt($stringA = null, $stringB = null)
   {
-    return hash('sha256', $string . Config::$array['SALT']);
+    $ab = (string)$stringA . self::salt($stringB);
+    if (!empty($ab)) return hash('sha256', $ab );
+  }
+
+  static function salt($string = null)
+  {
+    $char = array(
+      'a' => '5COB',
+      'b' => 'Y3WC',
+      'c' => 'Y7WN',
+      'd' => 'COBV',
+      'e' => 'NFVG',
+      'f' => 'F7CJ',
+      'g' => '57JK',
+      'e' => 'L77Y',
+      'h' => 'Y8LC',
+      'i' => 'BJT3',
+      'j' => 'XCTN',
+      'k' => 'FFSW',
+      'l' => 'JLVX',
+      'm' => 'CJXN',
+      'n' => 'BZHU',
+      'o' => 'LBNF',
+      'p' => 'XXZM',
+      'q' => 'FB6I',
+      'r' => 'NKKX',
+      's' => 'UF3U',
+      't' => 'KUFC',
+      'u' => 'DJBX',
+      'v' => 'VKX6',
+      'w' => 'V7VK',
+      'x' => 'SBWJ',
+      'y' => '9NR7',
+      'z' => 'XO64',
+      );
+
+    $length = strlen($string);
+    if ($length) {
+      for ($i = 0; $i < $length; $i++) $salt .= $char[$string[$i]]; 
+      return $salt; 
+    }
+  }
+  static function oldSalt($string)
+  {
+    return hash('sha256', $string . App::getInstance()->get(array('config', 'SALT')));
   }
   static function random($length = 8, $chars = 'bcdfghjklmnprstvwxzaeiou')
   {
-    for ($p = 0; $p < $length; $p++) {
-      $result .= ($p%2) ? $chars[mt_rand(19, 23)] : $chars[mt_rand(0, 18)];
-    }
+    $i = strlen($chars)-1;
+    for ($p = 0; $p < $length; $p++) $result .= ($p%2) ? $chars[mt_rand($i%2,$i)] : $chars[mt_rand(0,$i)];
     return $result;
   }
   static function randomPlus()
@@ -28,11 +71,11 @@ class Crypt
   }
   static function token()
   {
-    return Session::put(Config::$array['session']['token'], self::unique());
+    return Session::put(App::getInstance()->get('config', array('session', 'token'), self::unique()));
   }
   static function check($token)
   {
-    $token_name = Config::$array['session']['token'];
+    $token_name = App::getInstance()->get('config', array('session', 'token'));
 
     if (Session::get($token_name) && $token === Session::get($token_name)) {
       Session::delete($token_name);
@@ -43,5 +86,30 @@ class Crypt
   static function unique()
   {
     return self::md5(uniqid() . microtime(TRUE) . mt_rand());
+  }
+  static function timeout($marker = array(), $unit = null)
+  {
+    $timeTable = array('month' => 12, 'week' => 30, 'day' => 7, 'hour' => 24, 'minute' => 60, 'second' => 60);
+
+    if (array_key_exists($marker, $timeTable)) {
+
+      $loop = false;
+      $timeout = 1;
+
+      foreach ($timeTable as $mark => $units) {
+        
+        if ($loop === true) $timeout = $timeout * $units;
+
+        if ($mark == $marker) {
+          $timeout = $timeout * $unit;
+          $loop = true;
+        }
+      }
+      return $timeout;
+    }
+  }
+  static function getTime()
+  {
+    return strtotime( '+30 days' );
   }
 }

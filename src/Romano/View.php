@@ -28,8 +28,8 @@ class View
   public static function twig($string  = null , $data = null)
   {
     $loader = new Twig_Loader_Filesystem(VIEW);
+    $twig = new Twig_Environment($loader);
     $twig = new Twig_Environment($loader, array('debug' => true, 'cache' => CACHE));
-    $twig->addGlobal('session', $_SESSION);
     $twig->addGlobal('site', site);
     echo $twig->render($string, (array) $data);
   }
