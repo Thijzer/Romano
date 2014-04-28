@@ -19,21 +19,20 @@ class DB extends \PDO
     try {
       parent::__construct($DB['DSN'], $DB['USER'], $DB['PASS'], $this->options); 
     } catch (\PDOException $e) {
-      if (DEV_ENV === true) $message = $e->getMessage();
+      if (DEV_ENV === true) $message = $e->getMessage(); dump($message);
       throw View::page('500','PDO CONNECTION ERROR: ' . $message);
     }
   }
 
   // prepares the statement and processes the values 
-  private function processParams($sql, $params)
+  private function processParams()
   {
     try {
       //if (!empty($sql) AND empty($params)) return $this->exec($sql);
-      if($this->stmt = $this->prepare($sql)) return $this->stmt->execute($params);
+      if($this->stmt = $this->prepare($this->query)) return $this->stmt->execute($this->params);
     } catch (\PDOException $e) {
-     if (DEV_ENV === true) $message = $e->getMessage();
-     dump($message);
-     throw View::page('500','PDO QUERY ERROR: '. $message);
+     if (DEV_ENV === true) $message = $e->getMessage(); dump($message);
+     throw View::page('500','PDO QUERY ERROR: ' . $message);
     }
   }
 
@@ -43,9 +42,9 @@ class DB extends \PDO
     $instance = Singleton::getInstance(get_class());  
     if (!empty($results)) {    
       $instance->query = $results['query'];
-      $instance->params = $results['params'];
+      $instance->params = (!empty($results['params'])) ? $results['params'] : null;
       $instance->stmt = null;
-      if ($run === true) $instance->processParams($instance->query, $instance->params);
+      if ($run === true) $instance->processParams();
     }
     return $instance;
   }
@@ -53,12 +52,12 @@ class DB extends \PDO
   // the following methods are extensions of the PDO class
   public function fetch()
   {
-    if ($this->query AND $this->processParams($this->query, $this->params)) return $this->stmt->fetch($this->fetchMode);
+    if ($this->query AND $this->processParams()) return $this->stmt->fetch($this->fetchMode);
   }
 
   public function fetchAll()
   {
-    if ($this->query AND $this->processParams($this->query, $this->params)) return $this->stmt->fetchAll($this->fetchMode);
+    if ($this->query AND $this->processParams()) return $this->stmt->fetchAll($this->fetchMode);
   }
 
   public function fetchPairs()

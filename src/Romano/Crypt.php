@@ -19,40 +19,12 @@ class Crypt
 
   static function salt($string = null)
   {
-    $char = array(
-      'a' => '5COB',
-      'b' => 'Y3WC',
-      'c' => 'Y7WN',
-      'd' => 'COBV',
-      'e' => 'NFVG',
-      'f' => 'F7CJ',
-      'g' => '57JK',
-      'e' => 'L77Y',
-      'h' => 'Y8LC',
-      'i' => 'BJT3',
-      'j' => 'XCTN',
-      'k' => 'FFSW',
-      'l' => 'JLVX',
-      'm' => 'CJXN',
-      'n' => 'BZHU',
-      'o' => 'LBNF',
-      'p' => 'XXZM',
-      'q' => 'FB6I',
-      'r' => 'NKKX',
-      's' => 'UF3U',
-      't' => 'KUFC',
-      'u' => 'DJBX',
-      'v' => 'VKX6',
-      'w' => 'V7VK',
-      'x' => 'SBWJ',
-      'y' => '9NR7',
-      'z' => 'XO64',
-      );
+    require_once ('app/config/salt.php');
 
     $length = strlen($string);
     if ($length) {
-      for ($i = 0; $i < $length; $i++) $salt .= $char[$string[$i]]; 
-      return $salt; 
+      for ($i = 0; $i < $length; $i++) $salt .= $char[$string[$i]];
+      return $salt;
     }
   }
   static function oldSalt($string)
@@ -97,7 +69,7 @@ class Crypt
       $timeout = 1;
 
       foreach ($timeTable as $mark => $units) {
-        
+
         if ($loop === true) $timeout = $timeout * $units;
 
         if ($mark == $marker) {

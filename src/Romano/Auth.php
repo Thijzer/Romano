@@ -20,29 +20,35 @@ class Auth
 	private static $rules = array();
 	private static $master = null;
 	private static $fields = array();
-	private static $level = null;
+	private static $level = 7;
 	private static $go = false;
 	private static $crudAcces = false;
 
-	public static function requestAccess($token = 7)
+	public static function requestAccess($user = null)
 	{
-		$user = Session::get('user');
-
-		if ($token === 7 AND $user) {
-
+		if(!empty($user) AND !$userToken = Session::get($user . '_token'))
+		{
 			$token = DB::run(Query::select('users')
 				->where(array('username' => $user))
 				->onFields('level')
 				->build())->fetch();
-			$token = !empty($token) ? $token['level'] : $token = 7;
+
+			Session::set(array($user . '_token' => $token['level']));
+
+			self::$level = !empty($token) ? $token['level'] : 7;
 		}
-		self::$level = $token;
+		elseif(!empty($user)) self::$level = $userToken;
+	}
+
+	public static function requestTables()
+	{
+		return array('auth', 'users', 'posts', 'gallery', 'tags', 'collection', 'collection_core', 'collection_user', 'collection');
 	}
 
 	public static function getContainer($table)
 	{
 		if ($table) {
-			$cont = array(
+			$tablesList = array(
 				'users' => array(
 					'read' => 52,
 					'read_fields' => array(
@@ -61,9 +67,44 @@ class Auth
 						'level' => 0
 					),
 					'crud' => 41
+				),
+				'collection_user' => array(
+					'read' => 52,
+					'read_fields' => array(
+						'id' => 0,
+						'user' => 7,
+						'title_id' => 7,
+						'own' => 7,
+						'additional' => 7
+					),
+					'crud' => 41
+				),
+				'collection' => array(
+					'read' => 52,
+					'read_fields' => array(
+						'id' => 7,
+						'url' => 7,
+						'title' => 7
+					),
+					'crud' => 41
+				),
+				'collection_core' => array(
+					'read' => 52,
+					'read_fields' => array(
+						'id' => 1,
+						'collection' => 7,
+						'title_id' => 7,
+						'category' => 7,
+						'title' => 7,
+						'owner' => 7,
+						'pic_path' => 7,
+						'release_date' => 7,
+						'created_on' => 7
+					),
+					'crud' => 41
 				)
 			);
-			return $cont[$table];
+			return $tablesList[$table];
 		}
 	}
 
@@ -80,32 +121,39 @@ class Auth
 		}
 	}
 
-	public static function crudAcces($container, $level)
+	public static function crudAcces($container = array())
 	{
 		$container = self::getContainer($container);
-		$masterKey = substr($container['crud'], 0, 1);
+		if (!empty($container)) {
 
-		if ($masterKey >= $level) self::$crudAcces = true; 
+			$masterKey = substr($container['crud'], 0, 1);
 
-		foreach ($container['read_fields'] as $key => $value) {
+			if ($masterKey >= self::$level) self::$crudAcces = true; 
 
-			if ($value >= $level) $fields[] = $key;
+			if (is_array($container)) foreach ($container['read_fields'] as $key => $value) if ($value >= self::$level) $fields[$key] = $key;
+			elseif ($value >= self::$level) $fields[$key] = $key;
 
+			self::$fields = $fields;
 		}
-		self::$fields = $fields;
+	}
+
+	public static function getAccess($array)
+	{
+		$item = DB::run(Query::select('auth')
+			->where($array)
+			->onFields('user_id')
+			->build())->fetch();
+		return $item['user_id'];
 	}
 
 	public static function saveAccess($array)
 	{
-		DB::run(Query::select('auth')
-			->save($array, 'user_id')
-			->build(), true);
+		DB::run(Query::select('auth')->save($array, 'user_id')->build(), true);
 	}
 
 	public static function getFields($table)
 	{
-		self::crudAcces($table, self::$level);
-		dump( self::$crudAcces );
+		self::crudAcces($table);
 		return self::$fields;
 	}
 }

@@ -133,8 +133,10 @@ class Query
 
   public function where($where = array(), $arg = array())
   {
-    $query = $this->assembleQuery((array) $where, $arg = array_merge($this->arguments, $arg) );
-    $this->setWhere($query, $arg);
+    if ((array) $where)  {
+      $query = $this->assembleQuery((array) $where, $arg = array_merge($this->arguments, $arg) );
+      $this->setWhere($query, $arg);
+    }
     return $this;
   }
 

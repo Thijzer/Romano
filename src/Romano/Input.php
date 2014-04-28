@@ -6,15 +6,11 @@ class Input
 
   public static function submitted($input = null)
   {
-    if (is_array($input)) {
-     self::$submit = $input;
-    }
-    else {
-      self::$submit = array_merge($_POST, $_GET);
-    }
+    if (is_array($input)) self::$submit = $input;
+    else self::$submit = array_merge($_POST, $_GET);
 
     if (!empty($input) AND isset(self::$submit[$input])) return true;
-    if (!empty(self::$submit)) return true;
+    elseif (!empty(self::$submit)) return true;
     return false;
   }
 
@@ -25,7 +21,7 @@ class Input
 
   public static function get($input = null)
   {
-    if ($input) return self::$submit[$input];
+    return self::$submit[$input];
   }
 
   public static function getInputs()
