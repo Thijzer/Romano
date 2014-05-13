@@ -1,17 +1,30 @@
 <?php
 session_start();
 
+spl_autoload_register(function($class)
+{
+  $array = array('app/models/', 'app/libs/src/Romano/', 'app/controllers/');
+  foreach ($array as $value) if( file_exists($value . $class . '.php')) require_once $value . $class . '.php';
+  App::getInstance()->set('stamp', $class, timestamp(2) );
+});
+
+function timestamp($i = null)
+{
+  return (float)substr(microtime(true) - TIME, 0, (int) $i+5) * 1000;
+}
+
 abstract class Singleton
 {
     private static $storage = array();
 
-    public static function getInstance($class)
+    static function getInstance($class = null)
     {
-        if(!static::$storage[$class]) static::$storage[$class] = new $class();
+        if(!isset(static::$storage[$class])) static::$storage[$class] = new $class();
 
         return static::$storage[$class];
     }
-    public static function storage()
+
+    static function storage()
     {
        return static::$storage;
     }
@@ -22,252 +35,386 @@ abstract class Singleton
 
 class App
 {
-  public $i = 0;
   public $container = array();
 
-  public static function getInstance()
+  static function getInstance()
   {
     return Singleton::getInstance(get_class());
   }
 
-  public function set($name, $value)
+  function set($name, $value, $values = null)
   {
-    if (!empty($name) AND is_array($value)) $this->container[$name] = $value;
+    if (is_string($name . $value) AND !empty($values)) $this->container[$name][$value] = $values;
+    elseif (!empty($name) AND is_array($value)) $this->container[$name] = $value;
   }
 
-  public function setting($name1, $position, $val)
-  {
-    if (!empty($val)) $this->container[$name1][$position] = $val;
-  }
-
-  public function setArray($name, $array)
-  {
-    if (!empty($name)  AND is_array($array)) $this->container[$name] = $array;
-  }
-
-  public function getVal($name, $value)
-  {
-    if (!empty($name)  AND is_array($value)) return $this->container[$name][$value];
-  }
-
-  public function get($name)
+  function get($name)
   {
     if (count($name) === 3) return $this->container[$name[0]][$name[1]][$name[2]];
     elseif (is_array($name)) return $this->container[$name[0]][$name[1]];
     elseif (!empty($name)) return $this->container[$name];
   }
 
-  public function getAll()
+  function getAll()
   {
     return $this->container;
   }
 
-  public function config($array)
+  function delete($name)
   {
-    $this->setArray('config', $array);
-  }
-
-  public function setPath($array)
-  {
-    $this->setArray('path ' . $this->i++, $array);
-  }
-
-  public function getPath()
-  {
-    return $this->container['path ' . $this->i];
+    unset($this->container[$name]);
   }
 }
 
 class Session
 {
-  public static function set($array)
+  static function set($array)
   {
     foreach ($array as $key => $value) if (!empty($value)) $_SESSION[$key] = $value;
   }
 
-  public static function get($name)
+  static function get($name)
   {
-    return $_SESSION[$name];
+    if(isset($_SESSION[$name])) return $_SESSION[$name];
   }
 
-  public static function delete($name)
-  { 
-    unset($_SESSION[$name]);
-  }
-
-  public static function exists($name)
+  static function delete($name)
   {
-    return (isset($_SESSION[$name])) ? true : false;
+    if(is_array($name)) unset($_SESSION[$name[0]][$name[1]]);
+    else unset($_SESSION[$name]);
   }
 
-  public static function flash($name, $string)
+  static function flash($name, $string)
   {
     if (self::exists($name)) {
       $session = self::get($name);
       self::delete($name);
       return $session;
-    } else {
-      self::set(array($name, $string));
     }
+    else self::set(array($name, $string));
+  }
+
+  static function destroy()
+  {
+    $_SESSION = array();
+    session_regenerate_id();
   }
 }
 
 class Cookie
 {
-  public static function set($name, $value, $expiry)
+  static function set($name, $val, $expiry)
   {
-    $cookieData = array( "data" => $value, "expiry" => $expiry );
-    if (setcookie($name, serialize( $cookieData ), $expiry)) return true;
-    return false;
+    return setcookie($name, serialize(array("data" => $val, "expiry" => $expiry)), $expiry);
   }
 
-  public static function get($name)
+  static function get($name)
   {
     return unserialize($_COOKIE[$name]);
   }
-  /*
-  public static function delete($name)
-  { 
-    if (self::get($name)) {
-      unset($_COOKIE[$name]);
-    }
+
+  static function exists($name)
+  {
+    return isset($_COOKIE[$name]);
   }
 
-  public static function exists($name)
+  static function delete($name)
   {
-    if (isset($_COOKIE[$name])) {
-      return true; 
-    }
+    self::set($name, '', time() - 1);
+    unset($_COOKIE[$name]);
+  }
+}
+
+class Input
+{
+  private static $submit = null;
+
+  public static function submitted($input = null)
+  {
+    if (is_array($input)) self::$submit = $input;
+    else self::$submit = array_merge($_POST, $_GET);
+
+    if (!empty($input) AND isset(self::$submit[$input])) return true;
+    elseif (!empty(self::$submit)) return true;
     return false;
   }
 
-  public static function delete($name)
+  public static function escape($string)
   {
-    self::set($name, '', time() - 1);
+    return htmlentities($string, ENT_QUOTES, 'UTF-8');
   }
-  */
+
+  public static function get($input = null)
+  {
+    return self::$submit[$input];
+  }
+
+  public static function getInputs()
+  {
+    return self::$submit;
+  }
 }
 
-class Http
+class Output
 {
 
-  static function redirect($value = '')
+  static function redirect($uri = '')
   {
-     exit(header('Location: ' . site . $value));
+     header('Location: ' . site . $uri);
   }
-}
 
-class View
-{
-
-  public static function render($data, $arg = array())
-  {
-    $arg = array_merge(array('title' => ucfirst($data['section'][1]), 'path' => $data['path'], 'theme' => 'theme', 'base' => 'base.php'), $arg);
-    require (VIEW . $arg['path'] . EXT);
-
-    if ($arg['theme'] !== 'no') {
-      require (TMPL . $arg['theme'] . EXT);
-    }
-    require (TMPL . $arg['base']);
-    die();
-  }
-  public static function page($code, $data = array())
+  static function page($code, $data = array())
   {
     $data = array('code' => $code);
-    require (VIEW . 'page.php');
-    require (TMPL . 'base.php');
-    die();
+    require VIEW . THEME . 'page.php';
   }
-  private static function track()
+
+  static function twig($data = null, $path, $filename = null)
   {
-    if (Session::get('current_location') !== url) {
+      $path = $path . '.twig';
+      $loader = new Twig_Loader_Filesystem(VIEW . THEME);
+      $twig = new Twig_Environment($loader);
+      $twig = new Twig_Environment($loader, array('debug' => true, 'cache' => CACHE));
+      self::view( $path . '.twig', $twig->render($path, (array) $data) );
+  }
+
+  static function csv($results, $path, $filename = null)
+  {
+    if(!$filename) $filename = self::uniqueFilename() . '.csv';
+
+    $outstream = fopen("php://output", "w");
+
+    self::setheader('Content-Type: text/csv', $filename);
+
+    fputcsv($outstream, array_keys($results[0]));
+
+    foreach($results as $key => $result) fputcsv($outstream, $result);
+
+    fclose($outstream);
+  }
+
+  static function xml($results, $path, $filename = null, $name = 'xml')
+  {
+    if(!$filename) $filename = self::uniqueFilename() . '.xml';
+
+    self::setheader('Content-Type: text/xml', $filename);
+
+    $xml = new XMLWriter();
+    $xml->openMemory();
+    $xml->startDocument('1.0', 'UTF-8');
+    if (empty($results[0])) foreach ($results as $key => $result) self::xml_parse($xml, $result, $key);
+
+    else self::xml_parse($xml, $results, $name);
+  }
+
+  static function rss($results, $path, $filename = null, $name = 'rss')
+  {
+    if(!$filename) $filename = self::uniqueFilename() . '.rss';
+
+    self::setheader('Content-Type: application/xml; charset=ISO-8859-1', $filename);
+
+    $xml = new XMLWriter();
+
+    date_default_timezone_set("Europe/Brussels");
+
+    $xml->openMemory();
+    $xml->startElement( 'rss' );
+    $xml->writeAttribute( 'version', '2.0' );
+    $xml->writeAttribute( 'xmlns:atom', 'http://www.w3.org/2005/Atom' );
+    $xml->startElement( 'channel' );
+    // $xml->writeElement( 'title', $title ); //required
+    // $xml->writeElement( 'link', urlencode( $link ) ); //required
+    // $xml->writeElement( 'description', $description ); //required
+    $xml->writeElement( 'pubDate', date("Y-m-d H:i:s") );
+    // $xml->writeElement( 'language', $language );
+    // $xml->writeElement( 'copyright', $copyright );
+    if (empty($results[0])) {
+      foreach ($results as $key => $result) self::xml_parse($xml, $result, $key);
+    }
+    else self::xml_parse($xml, $results, $name);
+  }
+
+  static function json($results, $path, $filename = null, $name = 'json')
+  {
+      if(!$filename) $filename = self::uniqueFilename() . '.json';
+      self::setheader('Content-type: application/json', $filename);
+      self::view( $filename, json_encode($results));
+  }
+
+  static function txt($results, $path, $filename = null, $name = 'txt')
+  {
+    if(!$filename) $filename = self::uniqueFilename() . '.txt';
+
+    self::setheader(array('Content-Type: application/octet-stream', 'Content-Transfer-Encoding: binary'), $filename);
+
+    $data = 'fields = ' . implode (', ', array_keys($results[0])) . "\n\n";
+
+    foreach($results as $key => $result) {
+      $data .= 'item '. $key . ':' . "\n";
+        foreach($result as $item_key => $item) {
+          $data .= $item_key . '=' . $item . "\n";
+        }
+        $data .= "\n";
+    }
+    self::view( $filename, $data);
+  }
+
+  static function dev($results)
+  {
+    if(DEV_ENV) dump(App::getInstance()->getAll()); dump($_SESSION); dump($results);
+  }
+
+  static function view($filename, $data)
+  {
+    // file_put_contents(CACHE . 'html/' . $filename, $data);
+    echo $data;
+  }
+
+  static function xml_parse($xml, $results, $name)
+  {
+    $xml->startElement($name);
+    foreach($results as $result) {
+        $xml->startElement($name . '-item');
+        foreach($result as $item_key => $item) {
+            $xml->startElement($item_key);
+            //$xml->writeAttribute($item_key, $item);
+            $xml->text($item);
+            $xml->endElement();
+        }
+        $xml->endElement();
+    }
+    $xml->endElement();
+    $xml->endDocument();
+    self::view( $filename, $xml->outputMemory(true));
+    $xml->flush();
+  }
+
+  static function setHeader($headers, $filename)
+  {
+    if (!is_array($headers)) header($headers);
+    else foreach ($headers as $value) header($value);
+    header('Content-Disposition: attachment; filename=' . $filename);
+    header('Pragma: no-cache');
+    header("Expires: 0");
+  }
+
+  static function uniqueFilename()
+  {
+    return md5(uniqid() . microtime(TRUE) . mt_rand());
+  }
+}
+
+class Track
+{
+  static function getIP()
+  {
+      foreach (array('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR') as $key){
+          if (isset($_SERVER[$key])) {
+              foreach (explode(',', $_SERVER[$key]) as $ip) {
+                if (filter_var(trim($ip), FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false) {
+                  return $ip;
+                }
+                elseif (DEV_ENV === true) return $ip;
+              }
+          }
+      }
+  }
+
+  static function location($url)
+  {
+    if ($url AND Session::get('current_location') !== $url) {
       Session::set(array('previous_location' => Session::get('current_location')));
-      Session::set(array('current_location' => url));
+      Session::set(array('current_location' => $url));
     }
   }
-  public static function twig($string  = null , $data = null)
+
+  static function getOS()
   {
-    self::track();
-    $loader = new Twig_Loader_Filesystem(VIEW);
-    $twig = new Twig_Environment($loader);
-    $twig = new Twig_Environment($loader, array('debug' => true, 'cache' => CACHE));
-    $twig->addGlobal('site', site);
-    $twig->addGlobal('title', title);
-    $twig->addGlobal('url', url);
-    $twig->addGlobal('session', $_SESSION);
-    echo $twig->render($string, (array) $data);
+    //$spiders = array('Googlebot', 'Yammybot', 'Openbot', 'Yahoo', 'Slurp', 'msnbot', 'ia_archiver', 'Lycos', 'Scooter', 'AltaVista', 'Teoma', 'Gigabot', 'Googlebot-Mobile');
+    $OS = array(
+      'Windows 7' => '(Windows NT 6.1)', 'Windows 8' => '(Windows NT 6.2)',
+      'Windows Vista' => '(Windows NT 6.0)', 'Mac OS' => '(Mac_PowerPC)|(Macintosh)',
+      'Linux' => '(Linux)|(X11)',
+
+      'iPhone' => 'Apple-iPhone/', 'iPod' => 'Apple-iPod/',
+      'iPad' => 'Apple-iPad/', 'Android' => 'Linux; U; Android',
+      'Search Bot' => '(nuhk)|(Googlebot)|(Yammybot)|(Openbot)|(Slurp)|(MSNBot)|(Ask Jeeves/Teoma)|(ia_archiver)',
+      'Windows 3.11' => 'Win16', 'Windows 95' => '(Windows 95)|(Win95)|(Windows_95)',
+      'Windows 98' => '(Windows 98)|(Win98)', 'Windows 2000' => '(Windows NT 5.0)|(Windows 2000)',
+      'Windows XP' => '(Windows NT 5.1)|(Windows XP)', 'Windows Server 2003' => '(Windows NT 5.2)',
+      'Windows NT 4.0' => '(Windows NT 4.0)|(WinNT4.0)|(WinNT)|(Windows NT)', 'Windows ME' => 'Windows ME',
+      'Open BSD' => 'OpenBSD', 'Sun OS' => 'SunOS', 'QNX' => 'QNX', 'BeOS' => 'BeOS', 'OS/2' => 'OS/2'
+    );
+
+    foreach($OS as $current0S => $match) {
+        if (eregi($match, $_SERVER['HTTP_USER_AGENT'])) return $current0S;
+    }
   }
 }
 
 class Route
 {
-  function __construct($app)
+  function express($app)
   {
-    $app->setting('stamp', 'router_start', timestamp(2) );
+    $seo = $app->get('seo');
+    $uri = trim(str_replace('?' . $_SERVER['QUERY_STRING'], '', $_SERVER['REQUEST_URI']), '/');
+    $uri_parts = pathinfo($uri); //'filename', 'basename', 'extension'
+    $pos = count($section = explode('/', $uri));
+    $pos > 1 ? list($ctrlr, $method) = $section : $ctrlr = $section[0];
 
-    $url = str_replace('?'. $_SERVER['QUERY_STRING'], '', $_SERVER['REQUEST_URI']);
+    if ((!isset($method) AND $seoPath = $seo[$ctrlr])
+      OR (isset($seo[$ctrlr . '/' . $method]) AND $seoPath = $seo[$ctrlr . '/' . $method])
+      OR (isset($seo[$ctrlr . '/$']) AND $seoPath = $seo[$ctrlr . '/$'])
+      OR (isset($seo[$ctrlr . '/' . $method . '/$']) AND $seoPath = $seo[$ctrlr . '/' . $method . '/$'])
+    )
+    {
 
-    // find view with a dot in the end
-    list($url, $view) = explode('.', $url);
+      // correct the new variables
+      $count = count(list($ctrlr, $method) = explode('/', $seoPath['path']));
 
-    // count,trim, dissect the given url into sections, 1 ctrlr / 2 method
-    $pos = count($section = list($ctrlr, $method) = explode('/', $url = trim($url, '/')));
- 
-    $seo = array(
-      '' => array('path' => 'home/index'),
-      'login' => array('path' => 'home/login'),
-      'logout' => array('path' => 'home/logout'),
-      'lost' => array('path' => 'users/lost'),
-      'about' => array('path' => 'home/about'),
-      'contact' => array('path' => 'home/contact'),
-      'collection' => array('path' => 'collection/index'),
-      'movies' => array('path' => 'collection/index', 'addParam' => 1),
-      //'movies/$' => array('path' => 'collection/index', 'addParam' => 1),
-      'movie/$' => array('path' => 'collection/details', 'addParam' => 1)
-    );
+      if (isset($seoPath['addParam'])) {
 
-    if (($d = $seo[$ctrlr . '/' . $method]) OR ($d = $seo[$ctrlr . '/$']) OR ($d = $seo[$ctrlr] AND empty($method)) ) {
+        $i = $pos - $seoPath['addParam'];
+        $max = $count + $seoPath['addParam'];
 
-      if (!empty($d['addParam'])) $d['path'] .= '/' . $url;
-      $pos = count($section = list($ctrlr, $method) = explode('/', $d['path']));
+        // redirect if we find more the allowed params
+        if ($pos > $max) Output::redirect( trim($url, $section[$pos - 1]) );
+        for ($i; $i < $pos ; $i++) $params[] = $section[$i];
+      }
     }
-        //dump(trim($url, $section[$pos-1]));
-
-    if (($d['addParam'] - $pos + 3) < 0) Http::redirect( trim(trim($url, $section[$pos-1]), '/') );
 
     // now all values are set lets compare against the paths array
-    $app->setArray(
-      'route', 
-      array(
-        'controller' => $ctrlr, 
-        'method' => $method,
-        'parameter' => ($section[2] ? array_splice($section, 2, $pos) : false), 
-        'positions' => $pos, 
+    $app->set(
+      'route', array(
+        'parameter' => isset($params) ? $params : null,
+        'controller' => $ctrlr, 'method' => $method,
+        'positions' => $pos,
         'path' => $path = $ctrlr . '/' . $method,
-        'uri' => $url,
-        'view' => ($view ? $view : $view = 'twig')
-      )
+        'filename' => $ctrlr . '-' . $method,
+        'view' => $view = (!isset($uri_parts['extension']) ? 'twig' : $uri_parts['extension'])
+    ));
+
+    $meta = array(
+        'site' => site,
+        'uri' => $uri,
+        'title' => title,
+        'language' => '',
+        'description' => ''
     );
 
-    //dump($app->get('route'));
-
-    if ($method[0] !== '_' && method_exists($class = ucfirst($ctrlr), $method) && is_callable($class , $method)) {
+    // check if method exists
+    if (method_exists($class = ucfirst($ctrlr), $method) && is_callable($class , $method)) {
       $object = new $class($app);
-      $data = $object->$method($app);
-
-      // action line
-      if ($view !== 'twig' AND !empty($app)) {
-        $app->setting('stamp', 'view_exit', timestamp(2) );
-        Output::$view($data, $ctrlr);
-      }
-      return;
+      $results = $object->$method($app);
+      $results['meta'] = $meta;
+      return $results;
+    }
+    // check if file exsists
+    elseif (file_exists(VIEW . THEME . $path . '.' . $view)) {
+      $results['meta'] = $meta;
+      return $results;
     }
 
-    if (file_exists(VIEW . $path . '.twig')) {
-      \View::twig($path . '.twig');
-      return;
-    }
-
-    \View::page(404, 'error');
+    Output::page(404);
   }
 }

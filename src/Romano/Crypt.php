@@ -19,7 +19,7 @@ class Crypt
 
   static function salt($string = null)
   {
-    require_once ('app/config/salt.php');
+    require_once 'app/config/salt.php';
 
     $length = strlen($string);
     if ($length) {
@@ -57,7 +57,7 @@ class Crypt
   }
   static function unique()
   {
-    return self::md5(uniqid() . microtime(TRUE) . mt_rand());
+    return md5(uniqid() . microtime(TRUE) . mt_rand() );
   }
   static function timeout($marker = array(), $unit = null)
   {

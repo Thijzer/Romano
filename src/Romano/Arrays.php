@@ -1,6 +1,6 @@
 <?php
 
-class Array
+class Arrays
 {
 	private static $alfabet = array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z');
 	private static $numbers = array (0,1,2,3,4,5,6,7,8,9);
@@ -24,11 +24,29 @@ class Array
       $arrays = array_slice(func_get_args(), 1);
       $r = array();
       foreach($arrays as &$a) {
-         if(array_key_exists($key, $a)) {
+      	if(array_key_exists($key, $a)) {
             $r[] = $a[$key];
             continue;
          }
       }
       return $r;
+    }
+
+    static function returnOnKeys($data, $keys) {
+    	// arraflip rotates the array key => val to val => key
+    	return array_intersect_key($section, array_flip($Keys));
+    }
+
+	/*
+	 * return keys from your array with a mutual key
+	 *
+	*/
+  public static function makeKeys($results)
+  {
+    //create collum names
+    foreach ($results[0] as $key => $result) {
+      $keys[] = $key;
+    }
+    return $keys;
    }
 }

@@ -1,5 +1,4 @@
 <?php
-
 /*
 * user levels
 * ===========
@@ -12,6 +11,7 @@
 * user 		= 6
 * global 	= 7
 *
+* three domains / view / grab / crud
 */
 
 class Auth
@@ -128,7 +128,7 @@ class Auth
 
 			$masterKey = substr($container['crud'], 0, 1);
 
-			if ($masterKey >= self::$level) self::$crudAcces = true; 
+			if ($masterKey >= self::$level) self::$crudAcces = true;
 
 			if (is_array($container)) foreach ($container['read_fields'] as $key => $value) if ($value >= self::$level) $fields[$key] = $key;
 			elseif ($value >= self::$level) $fields[$key] = $key;
