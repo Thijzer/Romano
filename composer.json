@@ -15,8 +15,8 @@
         "php": ">=5.3.3"
     },
     "autoload": {
-        "psr-0": { 
-        	"Romano": "src/Romano" 
+        "psr-4": { 
+            "Romano\\": "src/Romano/" 
         }
     }
 }

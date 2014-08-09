@@ -7,18 +7,18 @@ function timestamp($i = null)
     return (float) substr(microtime(true) - TIME, 0, (int) $i + 5) * 1000;
 }
 
-spl_autoload_register(function($class)
-{
-    $app = App::getInstance();
-    $array = array('app/controllers/', 'app/models/', 'app/libs/src/Romano/');
-    foreach ($array as $path) {
-        if(!class_exists($class) && is_file($path . $class . '.php')) {
-            $app->set('stamp', $class, timestamp(2));
-            //if (is_callable($class, '__init__')) $class::__init__();
-            return require_once $path . $class . '.php';
-        }
-    }
-});
+// spl_autoload_register(function($class)
+// {
+//     $app = App::getInstance();
+//     $array = array('app/controllers/', 'app/models/', 'app/libs/src/Romano/');
+//     foreach ($array as $path) {
+//         if(!class_exists($class) && is_file($path . $class . '.php')) {
+//             $app->set('stamp', $class, timestamp(2));
+//             //if (is_callable($class, '__init__')) $class::__init__();
+//             return require_once $path . $class . '.php';
+//         }
+//     }
+// });
 
 abstract class Singleton
 {
