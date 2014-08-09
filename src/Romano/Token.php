@@ -3,7 +3,7 @@
 * moved to Crypt
 */
 class Token
-{	
+{
 	public static function generate()
 	{
 		return Session::set(Config::$array['session']['token'], md5(uniqid()));

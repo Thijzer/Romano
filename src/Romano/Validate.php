@@ -12,109 +12,110 @@
   */
 class Validate
 {
-  private $gate;
+    private $gate;
+    private $errors = array();
+    private $source =  array();
+    private $data = array();
 
-  private $errors = array(),
-          $data = array();
-
-  public function check($source, $items = array() )
-  {
-    foreach ($items as $item => $rules) {
-
-      $this->gate = true;
-      foreach ($rules as $rule => $rule_value) {
-        $value = trim($source[$item]);
-        if ($this->gate === true) {
-          switch ($rule) {
-            case 'required':
-              if (empty($value) AND $rule_value === true ) {
-                $this->addError("{$item} is required ");
-              }
-              break;
-            case 'min':
-              if (strlen($value) < $rule_value) {
-                $this->addError("{$item} must have a minimum of {$rule_value} characters ");
-              }
-              break;
-            case 'max':
-              if (strlen($value) > $rule_value) {
-                $this->addError("{$item} must have a maximum of {$rule_value} characters ");
-              }
-              break;
-            case 'matches':
-              if ($value !== $source[$rule_value]) {
-                $this->addError("{$item} has no match ");
-              }
-              break;
-            case 'regex':
-              if (!preg_match($rule_value, $value) ) {
-                $this->addError("{$item} has no character match ");
-              }
-              break;
-            case 'db':
-              if (is_array($rule_value)) {
-                $this->checkDB($rule_value, strtolower($item), strtolower($value));
-              }
-              break;
-            default:
-              $this->addError("{$rule} is not an active rule ");
-              break;
-          }
-        }
-      }     
-      if (!$this->errors) {
-        $this->data[$item] = $value;
-      }
+    function __construct($data)
+    {
+        $this->source = $data;
     }
-  }
 
-  public function requireAll($source)
-  {
-    foreach ($source as $key => $value) {
-      if (empty($value)) $this->addError($key . ' is required ');
-    }
-  }
-
-  public function checkDB($array, $where_key, $where_val)
-  {
-    $result = DB::run(
-      Query::select($array['table'])
-        ->where(array($where_key => $where_val))
-    )->fetch();
-
-    if ($result) {
-      foreach ($array as $key => $value) {
-        switch ($key) {
-          case 'unique':
-            if ($result AND $value === true) {
-              $this->addError($where_key . ' exists ');
+    public function check($item ,$rules = array() )
+    {
+        $this->gate = true;
+        foreach ($rules as $rule => $rule_value) {
+            $value = trim($this->source[$item]);
+            if ($this->gate === true) {
+                switch ($rule) {
+                    case 'required':
+                        if (empty($value) AND $rule_value === true ) {
+                            $this->addError(Lang::get('error.valid.required', array('{{item}}' => $item)));
+                        }
+                        break;
+                    case 'min':
+                        if (strlen($value) < $rule_value) {
+                            $this->addError(Lang::get('error.valid.minchar', array('{{item}}' => $item, '{{rule_value}}' => $rule_value)));
+                        }
+                        break;
+                    case 'max':
+                        if (strlen($value) > $rule_value) {
+                            $this->addError(Lang::get('error.valid.maxchar', array('{{item}}' => $item, '{{rule_value}}' => $rule_value)));
+                        }
+                        break;
+                    case 'matches':
+                        if ($value !== $rule_value) {
+                            $this->addError(Lang::get('error.valid.nomatch', array('{{item}}' => $item)));
+                        }
+                        break;
+                    case 'regex':
+                        if (!preg_match($rule_value, $value) ) {
+                            $this->addError(Lang::get('error.valid.nomatch', array('{{item}}' => $item)));
+                        }
+                        break;
+                    case 'db':
+                        if (is_array($rule_value)) $this->checkDB($rule_value, strtolower($item), strtolower($value));
+                        break;
+                    default:
+                        // needs to be logged
+                        exit(Lang::get('error.valid.norule', array('{{rule}}' => $item)));
+                        break;
+                }
             }
-            break;
-          case 'active':
-            if ($result['active'] === 1 AND $value === false) {
-              $this->addError($where_key . " is activated ");
-            }elseif (empty($result['active']) AND $value === true) {
-              $this->addError($where_key . " is not activated ");
-            }
-            break;        
         }
-      }
-      if (!$this->errors) {
-        $this->data[$where_key] = $where_val;
-      }
+        if (!$this->errors) $this->data[$item] = $value;
     }
-  }
-  private function addError($error)
-  {
-    $this->errors[] = $error;
-    $this->gate = false;
-  }
-  public function errors()
-  {
-    return $this->errors;
-  }
-  public function getField($item)
-  {
-    return $this->data[$item];
-  }
-} 
+
+    public function requireAll()
+    {
+        foreach ($this->source as $key => $value) if (empty($value)) {
+            $this->addError(Lang::get('error.valid.required', array('{{item}}' => $item)));
+        }
+    }
+
+    public function checkDB($array, $where_key, $where_val)
+    {
+        $result = DB::run(
+            Query::table($array['table'])
+            ->where(array($where_key => $where_val))->build()
+        )->fetch();
+
+        if ($result) {
+            foreach ($array as $key => $value) {
+                switch ($key) {
+                    case 'unique':
+                        if ($result AND $value === true) {
+                            $this->addError(Lang::get('error.valid.db.exsits', array('{{item}}' => $where_key)));
+                        }
+                        break;
+                    case 'active':
+                        if ($result['active'] === 1 AND $value === false) {
+                            $this->addError(Lang::get('error.valid.db.active', array('{{item}}' => $where_key)));
+                        }
+                        elseif (empty($result['active']) AND $value === true) {
+                            $this->addError(Lang::get('error.valid.db.notactive', array('{{item}}' => $where_key)));
+                        }
+                        break;
+                }
+            }
+            if (!$this->errors) $this->data[$where_key] = $where_val;
+        }
+    }
+
+    private function addError($error)
+    {
+        $this->errors[] = $error;
+        $this->gate = false;
+    }
+
+    public function errors()
+    {
+        return $this->errors;
+    }
+
+    public function get($item)
+    {
+        return trim($this->data[$item]);
+    }
+}

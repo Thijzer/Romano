@@ -28,7 +28,7 @@ class Auth
 	{
 		if(!empty($user) AND !$userToken = Session::get($user . '_token'))
 		{
-			$token = DB::run(Query::select('users')
+			$token = DB::run(Query::table('users')
 				->where(array('username' => $user))
 				->onFields('level')
 				->build())->fetch();
@@ -139,7 +139,7 @@ class Auth
 
 	public static function getAccess($array)
 	{
-		$item = DB::run(Query::select('auth')
+		$item = DB::run(Query::table('auth')
 			->where($array)
 			->onFields('user_id')
 			->build())->fetch();
@@ -148,7 +148,7 @@ class Auth
 
 	public static function saveAccess($array)
 	{
-		DB::run(Query::select('auth')->save($array, 'user_id')->build(), true);
+		DB::run(Query::table('auth')->save($array, 'user_id')->build(), true);
 	}
 
 	public static function getFields($table)

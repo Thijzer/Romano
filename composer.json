@@ -14,11 +14,9 @@
     "require": {
         "php": ">=5.3.3"
     },
-    "require-dev": {
-        "phpdocumentor/phpdocumentor": "*",
-        "phpunit/phpunit": "*"
-    },
     "autoload": {
-        "psr-0": { "Romano": "src/" }
+        "psr-0": { 
+        	"Romano": "src/Romano" 
+        }
     }
 }
