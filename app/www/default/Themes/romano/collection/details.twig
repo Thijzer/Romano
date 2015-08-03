@@ -1,0 +1,18 @@
+{% extends "base.twig" %}
+{% block content %}
+    <div class="container">
+
+			<div class="col-lg-4 col-md-3 col-xs-6 thumb">
+				<img class="img-responsive" src="/{{ movie.pic_path}}">
+			</div>
+			<h3>{{ movie.title }}</h3>
+			<div class="col-lg-4 col-md-3 col-xs-6">
+			<ul>
+				<li>category : {{ movie.category }}</li>
+				<li>release date : {{ movie.release_date }}</li>
+				<li>produced : {{ movie.owner }}</li>
+				<li>owns it : {{ user.own }}</li>
+			</ul>
+			</div>
+    </div>
+{% endblock %}

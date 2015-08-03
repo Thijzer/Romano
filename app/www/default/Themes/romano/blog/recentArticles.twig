@@ -1,0 +1,10 @@
+<div>
+  <h3 class="widget-title">{{ 'lbl.recent.post'|lng|capitalize }}</h3>
+
+  <ul>
+    {% for item in titles %}
+        <li><a href="{{ meta.site }}blog/article/{{ item.id }}/{{ item.uri }}">{{ item.title }}</a></li>
+    {% endfor %}
+  </ul>
+
+</div>

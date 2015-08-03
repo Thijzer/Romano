@@ -1,0 +1,9 @@
+{% extends "base-simple.twig" %}
+{% block content %}
+    <div class="container">
+        <a href="{{ loginUrl }}">login with facebook</a>
+    </div> <!-- /container -->
+{% endblock %}
+{% block css %}
+    <link href="{{ meta.site }}css/login.css" rel="stylesheet" type="text/css">
+{% endblock %}

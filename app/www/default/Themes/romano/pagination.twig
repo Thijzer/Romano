@@ -1,0 +1,27 @@
+<nav>
+  <ul class="pagination">
+
+    <li {% if (pages.prev < 1) %}class="disabled">{% else %}>
+      <a href="{{ pages.url }}/{{ pages.prev }}" aria-label="{{ pages.prev_lbl }}">{% endif %}
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+
+    {% for page in 1..pages.num_pages %}
+        {% if (page == 1) %}
+            <li><a href="/">{{ page }}</a></li>
+        {% elseif (page == pages.requested_page) %}
+            <li class="active"><a href="{{ page }}">{{ page }}</a></li>
+        {% else %}
+            <li><a href="{{ pages.url }}/{{ page }}">{{ page }}</a></li>
+        {% endif %}
+    {% endfor %}
+
+    <li {% if (pages.next > pages.num_pages) %}class="disabled">{% else %}>
+      <a href="{{ pages.url }}/{{ pages.next }}" aria-label="{{ pages.next_lbl }}">{% endif %}
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+
+  </ul>
+</nav>

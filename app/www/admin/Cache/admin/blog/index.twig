@@ -1,0 +1,28 @@
+{# Generated file from Resource #}
+
+{% extends "base.twig" %}{% block content %}
+<section class="section">
+    <table>
+        <thead>
+          <tr>
+            <th>id #</th>
+            <th>title</th>
+            <th>date</th>
+            <th>public</th>
+          </tr>
+        </thead>
+        {% for post in posts %}
+          <tbody>
+            <tr>
+              <td>{{ post.id }}</td>
+              <td>{{ post.title }}</td>
+              <td>{{ post.date }}</td>
+              <td>{{ post.public }}</td>
+            </tr>
+          </tbody>
+        {% endfor %}
+    </table>
+</section>
+{% endblock %}
+
+{# locked #}

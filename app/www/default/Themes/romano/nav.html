@@ -1,0 +1,26 @@
+
+      <!-- === Navigation === -->
+      <header class="header">
+        <div class="container">
+          <h1>{{ title }}</h1>
+            <ul class="navcontainer lead">
+              <li><a href="/imabot"></a><a href="/">{{ 'nav.blog'|lng }} </a> //</li>
+              <li><a href="/collection">{{ 'nav.collection'|lng }} </a>//</li>
+              <li><a href="/contact">{{ 'nav.contact'|lng }} </a>//</li>
+              <li><a href="/about">{{ 'nav.about'|lng }} </a></li>
+              {% if session.user is defined %}
+              <li class="dropdown">//
+                <a href="/admin" class="dropdown-toggle" data-toggle="dropdown">{{ 'nav.admin'|lng }}<b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="/logout">{{ 'nav.logout'|lng }}</a></li>
+                  <li><a href="/admin/settings">{{ 'nav.settings'|lng }}</a></li>
+                  <li><a href="/admin/add">{{ 'nav.add'|lng }}</a></li>
+                  <li><a href="/collections/manage">{{ 'nav.manage.col'|lng }}manage collections</a></li>
+                  <li><a href="/collections/create">{{ 'nav.create.item'|lng }}create item</a></li>
+                </ul>
+              </li>
+              {% endif %}
+            </ul>
+            <HR>
+        </div>
+      </header>

@@ -1,6 +1,8 @@
 vendor
 .sync
 .garbage
+settings
+globals.php
 
 # OS generated files #
 ######################

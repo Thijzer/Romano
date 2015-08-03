@@ -1,0 +1,9 @@
+{% if session.user is not defined %}
+<div>
+  <h3 class="widget-title">{{ 'nav.login'|lng|capitalize }}</h3>
+  <ul>
+    <li><a href="{{ url('u_login') }}">{{ 'nav.login'|lng|capitalize }}</a></li>
+    <li><a href="{{ url('register') }}">{{ 'nav.register'|lng|capitalize }}</a></li>
+  </ul>
+</div>
+{% endif %}

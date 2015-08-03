@@ -1,0 +1,42 @@
+{% extends "base.twig" %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-8">
+      <div class="well">
+        <header class="page-header">
+          <h1>{{ post.title }}</h1>
+          <p>by {{ post.user }} published on {{ post.date }}</p>
+        </header>
+        <p>{{ post.body|raw }}</p>
+      </div>
+      <hr>
+        <label class="btn btn-danger" data-toggle="collapse" data-target="#demo">count comments</label>
+        <div id="demo" class="collapse in">
+          <form action='' method='post'>
+            <label for='user'>your comment</label>
+            <p>
+              <textarea name='body' rows='5' cols='50' maxlength="128" required></textarea>
+            </p>
+            <label for='user'>username</label>
+            <p>
+              <input type='text' name='user' id='user' required/>
+              <input type='submit' name='post' value='add Comment'/>
+            </p>
+          </form>
+
+          <div>
+            {% if comment.title_id %}
+            <div id="{{ comment.title_id }}"><h5>{{ comment.title_user }}</h5>
+              <p>{{ comment.title_body }}</p>
+                <p>posted on : {{ comment.date }}</p>
+            </div>
+            <hr class="dotted">
+            {% endif %}
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
