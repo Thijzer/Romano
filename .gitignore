@@ -1,3 +1,4 @@
+app/*/Cache/
 vendor
 .sync
 .garbage
