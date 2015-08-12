@@ -18,7 +18,7 @@ Class Crud extends DB
             $authTables = Auth::getFields($table);
 
             $query = Query::table($table)
-                ->onfields(array_intersect_key($fields, $authTables))
+                ->select(array_intersect_key($fields, $authTables))
                 ->where(array_intersect_key($where, $authTables))
                 ->build();
 

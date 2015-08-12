@@ -2,9 +2,10 @@
 
 class Post
 {
-    private $table = array(
-        'posts' => 'posts'
-    );
+    private $posts;
+
+    const TABLE = 'posts';
+    const CONTENT = 'posts_content';
 
     function getPosts($limit = 4, $offset = 0)
     {
@@ -16,8 +17,8 @@ class Post
             LEFT(pc.body, 300) AS preview,
             DATE_FORMAT(p.publish_on, '%d/%m/%Y') AS date,
             DATE_FORMAT(p.publish_on, '%H:%i:%s') AS time
-            FROM posts AS p
-            INNER JOIN posts_content AS pc ON pc.id = p.id
+            FROM {self::TABLE} AS p
+            INNER JOIN {self::CONTENT} AS pc ON pc.id = p.id
             WHERE p.public = 1 AND p.active = 1
             ORDER BY p.publish_on DESC LIMIT {$off} ,{$lim}"]
         )->fetchAll();
@@ -25,32 +26,32 @@ class Post
 
     function getRowCount()
     {
-        return DB::run(['query' => "SELECT COUNT(*) as count from posts"])->get('count');
+        return DB::run(['query' => "SELECT COUNT(*) as count from self::TABLE"])->get('count');
     }
 
     function getPost($postId)
     {
-        return DB::run(
-            Query::table($this->table['posts'], 'p')
-            ->join('posts_content', 'pc', 'p.id = pc.id')
-            ->where(array('p.id' => (int) $postId, 'p.active' => '1'))
-            ->build()
-        )->fetch();
+      if (!isset($this->posts[$postId])) {
+          $post = DB::run(
+              Query::table(self::TABLE, 'p')
+              ->join(self::CONTENT, 'pc', 'p.id = pc.id')
+              ->where(array('p.id' => (int) $postId, 'p.active' => '1'))
+              ->build()
+          )->fetch();
+          $this->posts[$postId] = $post;
+      }
+      return $this->posts[$postId];
     }
 
-    function getId($postId)
+    function exists($postId)
     {
-        return DB::run(
-            Query::table($this->table['posts'])
-            ->where(array('id' => (int) $postId, 'active' => 1))
-            ->build()
-        )->getId();
+        return ($this->getPost($postId));
     }
 
     function getArchivedArticles()
     {
         return DB::run(
-            Query::table($this->table['posts'])
+            Query::table(self::TABLE)
             ->select(array('id', 'title', 'uri'))
             ->where(array('active' => '1'))
             ->endQuery('Group by date')
@@ -61,7 +62,7 @@ class Post
     function getArticlesFromUser($author)
     {
         return DB::run(
-            Query::table($this->table['posts'])
+            Query::table(self::TABLE)
             ->where(array('author' => $author, 'active' => '1'))
             ->build()
         )->fetchAll();
@@ -70,7 +71,7 @@ class Post
     private function getIdFromSLug($slug, $author)
     {
         return DB::run(
-            Query::table($this->table['posts'])
+            Query::table(self::TABLE)
                 ->where(array('slug' => $slug))
         )->getId();
     }
@@ -78,22 +79,22 @@ class Post
     // function editPost($tags)
     // {
     //     if (isset($_POST['public'])) $public = '1';
-    //     DB::connect($this->table['posts'])->edit(array('title' => $_POST['title'], 'body' => $_POST['body'], 'tag' => $tags, 'public' => $public ));
+    //     DB::connect(TABLE)->edit(array('title' => $_POST['title'], 'body' => $_POST['body'], 'tag' => $tags, 'public' => $public ));
     // }
     //
     // // add a new blog entry
     // function addPost($tags)
     // {
     //     if (isset($_POST['public'])) $public = '1';
-    //     DB::connect($this->table['posts'])->add(array('title' => $_POST['title'], 'uid' => $_SESSION['uid'], 'author' => $_SESSION['username'], 'body' => $_POST['body'], 'tag' => $tags, 'public' => $public ));
+    //     DB::connect(TABLE)->add(array('title' => $_POST['title'], 'uid' => $_SESSION['uid'], 'author' => $_SESSION['username'], 'body' => $_POST['body'], 'tag' => $tags, 'public' => $public ));
     // }
 
     function getTitles()
     {
         return DB::run(['query' =>
             "SELECT pc.title, p.id, p.slug
-             FROM posts AS p
-             INNER JOIN posts_content AS pc ON pc.id = p.id
+             FROM {self::TABLE} AS p
+             INNER JOIN {self::CONTENT} AS pc ON pc.id = p.id
              WHERE p.active = '1'
              ORDER BY p.publish_on
              DESC LIMIT 5"]

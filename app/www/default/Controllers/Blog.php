@@ -15,9 +15,7 @@ class Blog extends Ctrlr
         $id = (int) $this->param('id');
         $title = (string) $this->param('title');
 
-        var_dump($this->post->getPost($id));exit;
-
-        if ($this->post->getId($id)){
+        if ($this->post->exists($id)){
             $response['post'] = $this->post->getPost($id);
             if ($response['post']['slug'] != $title) Output::redirect($this->route['path'] . '/' . $id . '/' .  $response['post']['slug']);
 

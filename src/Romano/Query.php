@@ -54,8 +54,8 @@ class Query
 
                     foreach ($array as $key => $value) {
 
-                        // example: "`id` ="
-                        $query .= '`' . $key . '`' . $arg['operator'];
+                        // example: "`id` = ":pid
+                        $query .= '' . $key . '' . $arg['operator'];
 
                         // optional key selection
                         if($arg['type'] ==  'params') {
@@ -146,6 +146,7 @@ class Query
 
     public function join($table, $nick, $ids)
     {
+        $this->arguments['type'] = '?';
         $this->startQuery .= "INNER JOIN {$table} AS {$nick} ON {$ids} ";
         return $this;
     }

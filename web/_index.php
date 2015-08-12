@@ -1,7 +1,6 @@
 <?php
+
 require '../globals.php';
-require 'settings/dev.php';
-stamp('Application');
 
 // start Request
 $request = new Request($_SERVER, $_REQUEST);
@@ -32,9 +31,6 @@ if
     // route view
     if ($view === config('view')) {
         view($result);
-    } elseif (config('kernel_debug') === true && $view === 'dev') {
-        stamp('View');
-        massdump($result);
     }
 } else {
     Output::page(404);
