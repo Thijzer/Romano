@@ -17,8 +17,8 @@ class Post
             LEFT(pc.body, 300) AS preview,
             DATE_FORMAT(p.publish_on, '%d/%m/%Y') AS date,
             DATE_FORMAT(p.publish_on, '%H:%i:%s') AS time
-            FROM {self::TABLE} AS p
-            INNER JOIN {self::CONTENT} AS pc ON pc.id = p.id
+            FROM posts AS p
+            INNER JOIN posts_content AS pc ON pc.id = p.id
             WHERE p.public = 1 AND p.active = 1
             ORDER BY p.publish_on DESC LIMIT {$off} ,{$lim}"]
         )->fetchAll();
@@ -26,7 +26,7 @@ class Post
 
     function getRowCount()
     {
-        return DB::run(['query' => "SELECT COUNT(*) as count from self::TABLE"])->get('count');
+        return DB::run(['query' => "SELECT COUNT(*) AS count FROM ".self::TABLE])->get('count');
     }
 
     function getPost($postId)
@@ -93,8 +93,8 @@ class Post
     {
         return DB::run(['query' =>
             "SELECT pc.title, p.id, p.slug
-             FROM {self::TABLE} AS p
-             INNER JOIN {self::CONTENT} AS pc ON pc.id = p.id
+             FROM posts AS p
+             INNER JOIN posts_content AS pc ON pc.id = p.id
              WHERE p.active = '1'
              ORDER BY p.publish_on
              DESC LIMIT 5"]
