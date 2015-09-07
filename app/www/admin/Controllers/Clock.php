@@ -1,6 +1,6 @@
 <?php
 
-class Clock
+class Clock extends Ctrlr
 {
     function construct()
     {
@@ -8,7 +8,8 @@ class Clock
     }
     function index()
     {
-
+      dump('D');
+      exit;
     }
 
     function addTime()

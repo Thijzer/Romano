@@ -32,7 +32,7 @@
                 "guzzlehttp/guzzle": "Allows for implementation of the Guzzle HTTP client"
             },
             "type": "library",
-            "autoload": {
+            "": {
                 "psr-4": {
                     "Facebook\\": "src/Facebook/"
                 }
@@ -77,7 +77,7 @@
                 "phpunit/phpunit": "4.3.*"
             },
             "type": "library",
-            "autoload": {
+            "": {
                 "classmap": [
                     "class.phpmailer.php",
                     "class.pop3.php",
@@ -123,7 +123,7 @@
                 "shasum": ""
             },
             "type": "library",
-            "autoload": {
+            "": {
                 "psr-0": {
                     "Psr\\Log\\": ""
                 }
@@ -181,7 +181,7 @@
                     "dev-master": "1.4.x-dev"
                 }
             },
-            "autoload": {
+            "": {
                 "psr-4": {
                     "Elastica\\": "lib/Elastica/",
                     "Elastica\\Test\\": "test/lib/Elastica/Test/"
@@ -223,7 +223,7 @@
                 "php": ">=5.3.3"
             },
             "type": "library",
-            "autoload": {
+            "": {
                 "psr-4": {
                     "Romano\\": "src/Romano/"
                 }
@@ -268,7 +268,7 @@
                     "dev-master": "1.18-dev"
                 }
             },
-            "autoload": {
+            "": {
                 "psr-0": {
                     "Twig_": "lib/"
                 }

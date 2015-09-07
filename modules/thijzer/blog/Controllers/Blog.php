@@ -10,18 +10,32 @@ class Blog extends Ctrlr
         $this->post = new Post();
     }
 
+    public function index()
+    {
+        $pages = $this->pagination($this->post->getRowCount(), 0, 4);
+        $response['pages'] = $pages;
+        $response['post'] = $this->post->getPosts($pages['limit'], $pages['offset']);
+        $response['titles'] = $this->post->getTitles();
+        return $response;
+    }
+
     function article()
     {
         $id = (int) $this->param('id');
         $title = (string) $this->param('title');
 
-        if ($this->post->getId($id)){
-            $response['post'] = $this->post->getPost($id);
-            if ($response['post']['uri'] != $title) Output::redirect($this->route['path'] . '/' . $id . '/' .  $response['post']['uri']);
-
-            return $response;
+        if (!$this->post->exists($id)){
+            Output::page(404, 'from article');
         }
-        else Output::page(404, 'from article');
+
+        $response['post'] = $this->post->getPost($id);
+        $slug = $response['post']['slug'];
+
+        if ($slug !== $title) {
+            Output::redirect($this->route['path'].'/'.$id.'/'.$slug);
+        }
+        return $response;
+
     }
 
     function recentArticles()
@@ -38,7 +52,7 @@ class Blog extends Ctrlr
             $response['post'] = $this->post->getArticlesFromUser($user);
             return $response;
         }
-        else Output::page(404, 'from Usersbloggers');
+        Output::page(404, 'from Usersbloggers');
     }
 
     function getArchivedArticles()

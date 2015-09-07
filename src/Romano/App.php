@@ -43,6 +43,15 @@ class Application extends Container
     {
         return self::get(array('config', (string) $param));
     }
+    private function getModules($app, $modules)
+    {
+      $app = $app . 'modules/';
+      foreach ($modules as $module) {
+        $tmp[] = $app.$module."/Controllers/";
+        $tmp[] = $app.$module."/Models/";
+      }
+      return $tmp;
+    }
     public function buildProject()
     {
         $config = $this->getConfig();
@@ -55,7 +64,9 @@ class Application extends Container
         $path['cache'] = $path['app'].'Cache/';
         $path['controller'] = $path['app'].'Controllers/';
         $path['model'] = $path['app'].'Models/';
-        $path['autoload'] = array($path['controller'], $path['model'], $path['src']);
+        $modules = $this->getModules($config['root'], $config['modules']);
+        $path['autoload'] =  array_merge(array($path['controller'], $path['model'], $path['src']), $modules);
+
         if (isset($config['theme']) && isset($config['head']['site'])) {
             $path['root_url'] = $config['head']['site'];
             $path['theme_view'] = $path['app'].'Themes/'.$config['theme'].'/';
@@ -306,12 +317,20 @@ class Route
     {
         $this->request = $request;
         $this->r['parameter'] = array();
+        $this->r['controller'] = '';
+        $this->r['method'] = '';
+        $this->r['path_view'] = '';
     }
     private function findRoute(array $routes)
     {
+        // home
         if ($this->request->get('URI') == '' && isset($routes[''])) {
              return $routes[''];
         }
+        // if (preg_match('/' . str_replace('/', '\/', $value) . '$/', $this->request->get('URI')) {
+        //
+        // }
+
         // reduce the list look for first index
         $foundRoutes = (array) preg_grep("/{$this->request->getURLSection(0)}/i", array_keys($routes));
         foreach ($foundRoutes as $route) {
@@ -337,13 +356,6 @@ class Route
         }
         return $par;
     }
-    private function storeRoute()
-    {
-        if (Session::get('uri') != $this->request->get('uri')) {
-            Session::set(array('previous_uri' => Session::get('uri')));
-            Session::set(array('uri' => $this->request->get('uri')));
-        }
-    }
     public function search(array $routes)
     {
         $route = $this->findRoute($routes);
@@ -352,15 +364,12 @@ class Route
         }
         list($this->r['controller'], $this->r['method']) = explode('@', $route['resource']);
 
-        if (isset($route['rel']) && $route['rel'] !== 'nofollow') {
-            $this->storeRoute();
-        }
-
         $this->r['path'] = (isset($route['template'])) ? $route['template']: $this->r['controller'].'/'.$this->r['method'];
         $this->r['path_view'] = $this->r['path'].'.twig';
         $this->r['path_resource'] = $this->r['path'].'.php';
         $this->r['filename'] = $this->r['controller'].'-'.$this->r['method'];
-        $this->r['previous_uri'] = Session::get('previous_uri');
+        // we need to move this to the tracker
+        $this->r['previous_uri'] = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
         $this->r['resource'] = $route['resource'];
         Container::set(array('route', $this->r));
         return true;
@@ -429,7 +438,7 @@ class Lang
 
 class Resource
 {
-    private $storePath = '', $route = array(), $module = array(), $scope = array(), $block, $caviar = array(), $path, $baseFile = 'base.twig', $name, $lock = false;
+    private $storePath = '', $route = array(), $scope = array(), $block, $caviar = array(), $path, $baseFile = 'base.twig', $name, $lock = false;
     private $options = array(
         'twig' => array(
             'extends' => '{% extends "$1" %}',
@@ -457,37 +466,19 @@ class Resource
 
     public function scope($re) // we need to move it to render
     {
-        if(isset($this->scope[$re])) return $this->scope[$re];
+        if(isset($this->scope[$re])) {
+          return $this->scope[$re];
+        }
 
         list($ctrl, $method) = explode('@', $re);
-
-        if (!empty($this->module)) {
-            require 'modules/'.$this->module.'/Controllers/'.ucfirst($ctrl).'.php';
-            $this->module = array();
-        }
-
-        if (isset($this->index[$ctrl]))
-        {
-            $this->scope[$re] = (array) $this->index[$ctrl]->$method();
-            $this->caviar = array_merge($this->caviar, $this->scope[$re]);
-            return $this;
-        }
-        elseif (is_callable($class = ucfirst($ctrl), $method)) {
+        if (is_callable($class = ucfirst($ctrl), $method)) {
             $class = new $class();
             $this->index[$ctrl] = $class;
             $this->scope[$re] = (array) $class->$method();
             $this->caviar = array_merge($this->caviar, $this->scope[$re]);
-
             return $this;
         }
-        else die('resoure@scope undefined method passed');
-
-    }
-
-    public function module($moduleName)
-    {
-        $this->module = $moduleName;
-        return $this;
+        die('resoure@scope undefined method passed');
     }
 
     public function addToScope($name, $scope)
@@ -506,10 +497,11 @@ class Resource
         $this->storePath = $path;
     }
 
-    public function getRender($engine, $render = "{# Generated file from Resource #}\n\n")
+    public function getRender($engine, $render = "{# Generated file from Resource #}\n")
     {
         $root = path('cache') . path('theme_name').'/';
         $store = $root . $this->storePath.'.twig';
+        $render .= "{# ".date('l jS \of F Y h:i:s A')." #}\n\n";
 
         if(DEV_ENV !== true && file_exists($store)) return $this->storePath.'.twig';
 
@@ -655,5 +647,35 @@ abstract class Ctrlr
     function param($name)
     {
         return $this->params[$name];
+    }
+
+    function pagination($rowCount, $offset, $limit)
+    {
+        $requestedPage = 1;
+        if (!isset($this->params['page'])) {
+            $this->params['page'] = 1;
+        }
+        $options['offset'] = $offset;
+        $options['limit'] = $limit;
+
+        $options['num_items'] = $rowCount;
+        $requestedPage = (int) $this->params['page'];
+        $options['num_pages'] = (int) ceil($options['num_items'] / $options['limit']);
+
+        if ($options['num_pages'] === 0) {
+            $options['num_pages'] = 1;
+        }
+        if ($requestedPage > $options['num_pages'] || $requestedPage < 1) {
+            Output::redirect(404);
+        }
+
+        $options['requested_page'] = $requestedPage;
+        $options['prev'] = $requestedPage-1;
+        $options['next'] = $requestedPage+1;
+        $options['url'] = '/page';
+        $options['next_lbl'] = Lang::get('lbl.next');
+        $options['prev_lbl'] = Lang::get('lbl.prev');
+        $options['offset'] = ($options['requested_page'] * $options['limit']) - $options['limit'];
+        return $options;
     }
 }

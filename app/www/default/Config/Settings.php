@@ -22,6 +22,14 @@ return array(
             'fr' => 'fr_FR'
         ),
 
+
+        'EMAIL' => array(
+            'HOST' => 'smtp.gmail.com',
+            'USER' => 'TBCdevil@gmail.com',
+            'PASS' => '5783A5799U',
+            'FWRD' => 'donotreply@thijzer.com'
+        ),
+
         /* please do no switch your multi_language boolean in production */
 
         'multi_language' => false,

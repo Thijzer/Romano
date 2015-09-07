@@ -4,28 +4,23 @@
   <meta charset="{{ meta.charset }}">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dashboard</title>
-  <link rel="stylesheet" type="text/css" href="/css/dashboard.min.css">
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="/admin/css/bootstrap.min.css">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="/admin/css/bootstrap-theme.min.css">
   {% block css %}
   {% endblock %}
-  <script type="text/javascript" src="/js/vendors.min.js"></script>
-  <script type="text/javascript" src="/js/dashboard.min.js"></script>
-  <!-- <script type="text/javascript" src="/js/dashboard/module.js"></script> -->
-  <script type="text/javascript" src="/js/dashboard/controllers/master-ctrl.js"></script>
+  <script type="text/javascript" src="/admin/js/vendors.min.js"></script>
 </head>
-  <body ng-controller="MasterCtrl">
-      <div id="page-wrapper" ng-class="{'active': toggle}" ng-cloak>
+  <body>
+      <div>
       <!-- Sidebar -->
       {% include 'nav.html' %}
       <!-- End Sidebar -->
-        <div id="content-wrapper">
+        <div>
           <div class="page-content">
             <!-- Header Bar -->
             {% include 'header.html' %}
-            <!-- End Header Bar -->
-            <!-- Main Content -->
-            <section data-ui-view></section>
-            {#{% include 'messages.html' %}#}
-            <!-- End Main Content -->
             {% block content %}
             {% endblock %}
             {% include 'footer.html' %}
@@ -35,5 +30,7 @@
       </div><!-- End Page Wrapper -->
     {% block js %}
     {% endblock %}
-  </body>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="/admin/js/bootstrap.min.js"></script>
+    </body>
 </html>

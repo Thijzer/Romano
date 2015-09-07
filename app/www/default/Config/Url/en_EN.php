@@ -32,7 +32,8 @@ $routes = array(
     'movies' => array('resource' => 'collection@movies', 'template' => 'collection/index'),
     'movie/{title}' => array('resource' => 'collection@details'),
     'blog/article/{id}/{title}' => array('resource' => 'blog@article'),
-    'blog/{user}' => array('resource' => 'blog@users')
+    'blog/{user}' => array('resource' => 'blog@users'),
+    'testing/{text}' => array('resource' => 'testing@MainTest')
 );
 
 

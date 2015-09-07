@@ -1,10 +1,9 @@
 <?php
-$res->scope('home@pagination');
 //$res->module('thijzer/blog')->scope('blog@recentArticles');
-$res->scope('home@index');
+$res->scope('blog@index');
 //$res->scope('blog@recentArticles');
-$res->block('content')->html('home/articles');
+$res->block('content')->html('blog/articles');
 $res->block('sidebar')->html('blog/recentArticles');
-$res->block('sidebar')->html('home/recentCategories');
+$res->block('sidebar')->html('blog/recentCategories');
 $res->block('sidebar')->html('users/loggedIn');
 $res->block('content')->html('pagination');
