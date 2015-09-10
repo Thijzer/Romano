@@ -1,0 +1,41 @@
+{% extends "base_bs.twig" %}
+{% block content %}
+
+<a href="addTime">add a timer</a>
+<a href="addProject">add a project</a>
+
+<div class="container">
+  <form class="form-signin" action="" method="post">
+    <h2 class="form-signin-heading">Add a Timer</h2>
+
+    <div class="nf-field">
+      <label for="Project">Projects</label>
+      <select class="js-tasks chzn-done" name="tasks">
+        <optgroup label="Billable">
+            <option value="2797158">ascento</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="nf-field">
+      <label for="tasks">Tasks</label>
+      <select class="js-tasks chzn-done" name="tasks">
+        <optgroup label="Billable">
+            <option value="2797158">ascento</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <input type="text" class="form-control" placeholder="00:00">
+    <input type="textarea" class="form-control" placeholder="notes...">
+    <button class="btn btn-small btn-primary js-confirm-start-timer" href="#">Start Timer</button>
+    <button class="btn btn-small btn-cancel js-cancel-start-timer" href="#">Cancel</button>
+  </form>
+</div>
+
+
+
+{{ errors }}
+
+
+{% endblock %}

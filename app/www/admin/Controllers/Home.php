@@ -4,7 +4,6 @@ class Home
 {
     function index()
     {
-
     }
 
     function elastic()

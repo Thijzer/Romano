@@ -327,12 +327,20 @@ class Route
         if ($this->request->get('URI') == '' && isset($routes[''])) {
              return $routes[''];
         }
-        // if (preg_match('/' . str_replace('/', '\/', $value) . '$/', $this->request->get('URI')) {
-        //
-        // }
+        unset($routes['']);
 
         // reduce the list look for first index
         $foundRoutes = (array) preg_grep("/{$this->request->getURLSection(0)}/i", array_keys($routes));
+
+        // auto controller
+        if (isset($routes["{model}/{controller}/$"]) && count($foundRoutes) === 0) {
+            $class = $this->request->getURLSection(0);
+            $ctrlr = $this->request->getURLSection(1);
+            $index = $class.'/'.$ctrlr;
+            $routes[$index] =  array('resource' => $class.'@'.$ctrlr, 'rel' => 'nofollow');
+            $foundRoutes[] = $index;
+        }
+
         foreach ($foundRoutes as $route) {
             if (count($param = explode('/', $route)) === $this->request->count('SECTIONS')) {
                 // string manipulation
@@ -595,6 +603,15 @@ class DB extends \PDO
         return $this->stmt->fetch($this->fetchMode);
     }
 
+    public function fetchAllBy($value)
+    {
+        $results = $this->stmt->fetchAll($this->fetchMode);
+        foreach ($results as $result) {
+            $tmp[$result['id']] = $result;
+        }
+        return $tmp;
+    }
+
     public function get($value)
     {
         $temp = $this->stmt->fetch($this->fetchMode);
@@ -616,10 +633,13 @@ class DB extends \PDO
         return $this->stmt->fetchAll($this->fetchMode);
     }
 
-    public function fetchPairs()
+    public function fetchPairs($a, $b)
     {
-        if ($result = $this->stmt->fetch($this->fetchMode)) {
-            return array(reset($result) => end($result));
+        if ($results = $this->stmt->fetchAll($this->fetchMode)) {
+            foreach ($results as $result) {
+                $tmp[$result[$a]] = $result[$b];
+            }
+            return $tmp;
         }
     }
 

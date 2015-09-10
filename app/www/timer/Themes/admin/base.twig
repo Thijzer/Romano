@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" ng-app="Dashboard">
+<head>
+  <meta charset="{{ meta.charset }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard</title>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="/admin/css/bootstrap.min.css">
+  <!-- Optional theme -->
+
+  <!-- Custom styles for this template -->
+  <link href="starter-template.css" rel="stylesheet">
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+  <link rel="stylesheet" href="/admin/css/bootstrap-theme.min.css">
+
+  <!-- Custom styles for this template -->
+  <link href="/admin/css/starter-template.css" rel="stylesheet">
+
+  {% block css %}
+  {% endblock %}
+
+  <script type="text/javascript" src="/admin/js/vendors.min.js"></script>
+</head>
+  <body>
+      <div class="container">
+        <!-- Sidebar -->
+        {% include 'nav.html' %}
+        <!-- End Sidebar -->
+        <div class="starter-template">
+          <h1>Bootstrap starter template</h1>
+          <p class="lead">Use this document as a way to quickly start any new project.<br> All you get is this text and a mostly barebones HTML document.</p>
+        </div>
+        <div class="page-content">
+          <!-- Header Bar -->
+          {% include 'header.html' %}
+          {% block content %}
+          {% endblock %}
+          {% include 'footer.html' %}
+          {% include 'js.html' %}
+        </div><!-- End Page Content -->
+      </div><!-- /.container -->
+      {% block js %}
+      {% endblock %}
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="/admin/js/bootstrap.min.js"></script>
+    </body>
+</html>
