@@ -1,5 +1,5 @@
 {# Generated file from Resource #}
-{# Monday 7th of September 2015 07:17:29 PM #}
+{# Wednesday 16th of September 2015 09:48:39 PM #}
 
 {% extends "base.twig" %}{% block content %}
 {% for item in post %}
@@ -48,7 +48,7 @@
 
   <ul>
     {% for item in titles %}
-        <li><a href="{{ meta.site }}blog/article/{{ item.id }}/{{ item.uri }}">{{ item.title }}</a></li>
+        <li><a href="{{ meta.site }}blog/article/{{ item.id }}/{{ item.slug }}">{{ item.title }}</a></li>
     {% endfor %}
   </ul>
 

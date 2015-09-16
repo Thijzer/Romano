@@ -77,13 +77,12 @@ class Application extends Container
     }
     public function buildURL($urlList)
     {
-        $meta = $this->getParameter('meta');
         foreach($urlList as $key => $route) {
             if (isset($route['name'])) {
-                $tmp[$route['name']] = $meta['site'].'/'.$key;
+                $tmp[$route['name']] = '/'.$key;
                 continue;
             }
-            $tmp[str_replace(array('{','}'), '', $key)] = $meta['site'].'/'.$key;
+            $tmp[str_replace(array('{','}'), '', $key)] = '/'.$key;
         }
         Container::set(array('url', $tmp));
     }
@@ -397,7 +396,7 @@ class Route
     }
     public function getTemplate()
     {
-        if (file_exists(path('theme_view').$this->r['path_view'])) {
+        if (file_exists(path('theme_view').$this->r['path_view']) || file_exists(path('theme_cache').$this->r['path_view'])) {
             return array(
                 'path' => $this->r['path_view'],
                 'data' => array()

@@ -3,7 +3,7 @@
 
   <ul>
     {% for item in titles %}
-        <li><a href="{{ meta.site }}blog/article/{{ item.id }}/{{ item.uri }}">{{ item.title }}</a></li>
+        <li><a href="{{ meta.site }}blog/article/{{ item.id }}/{{ item.slug }}">{{ item.title }}</a></li>
     {% endfor %}
   </ul>
 

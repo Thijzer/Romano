@@ -20,6 +20,7 @@ Lang::set(require path('lang'));
 // start routes
 $route = new Route($request);
 $routes = require path('routes');
+
 if
 (
     ($route->search($routes['routes'])) &&
@@ -33,7 +34,7 @@ if
     //$track = Track::get()->fromClient();
 
     // route view
-    if ($view === config('view')) {
+    if ($route->getTemplate() && $view === config('view')) {
         view($result);
     } elseif (config('kernel_debug') === true && $view === 'dev') {
         stamp('View');
