@@ -1,23 +1,24 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a0bf9e34738c4902a4a0d43cc1dc0c5c",
+    "hash": "f3732bcbc7631db59e3cdcadaa707a0a",
+    "content-hash": "9657c4a69e8d3a03286895852559e848",
     "packages": [
         {
             "name": "facebook/php-sdk-v4",
-            "version": "4.0.20",
+            "version": "4.0.23",
             "source": {
                 "type": "git",
                 "url": "https://github.com/facebook/facebook-php-sdk-v4.git",
-                "reference": "0c8ea23d81e09cc7e2c38b1d7f663fd5006dce84"
+                "reference": "c82611e05596622c9bd7abfa1cea1512d885c95e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facebook/facebook-php-sdk-v4/zipball/0c8ea23d81e09cc7e2c38b1d7f663fd5006dce84",
-                "reference": "0c8ea23d81e09cc7e2c38b1d7f663fd5006dce84",
+                "url": "https://api.github.com/repos/facebook/facebook-php-sdk-v4/zipball/c82611e05596622c9bd7abfa1cea1512d885c95e",
+                "reference": "c82611e05596622c9bd7abfa1cea1512d885c95e",
                 "shasum": ""
             },
             "require": {
@@ -32,7 +33,7 @@
                 "guzzlehttp/guzzle": "Allows for implementation of the Guzzle HTTP client"
             },
             "type": "library",
-            "": {
+            "autoload": {
                 "psr-4": {
                     "Facebook\\": "src/Facebook/"
                 }
@@ -53,7 +54,7 @@
                 "facebook",
                 "sdk"
             ],
-            "time": "2015-03-03 00:03:54"
+            "time": "2015-04-03 20:31:47"
         },
         {
             "name": "phpmailer/phpmailer",
@@ -61,12 +62,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPMailer/PHPMailer.git",
-                "reference": "27cc5528ad8b3d1ad67d0eef561135fec7ccb90b"
+                "reference": "76619dd21a9b3cf43bdb5ca04f8fca31a04711dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/27cc5528ad8b3d1ad67d0eef561135fec7ccb90b",
-                "reference": "27cc5528ad8b3d1ad67d0eef561135fec7ccb90b",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/76619dd21a9b3cf43bdb5ca04f8fca31a04711dd",
+                "reference": "76619dd21a9b3cf43bdb5ca04f8fca31a04711dd",
                 "shasum": ""
             },
             "require": {
@@ -74,14 +75,21 @@
             },
             "require-dev": {
                 "phpdocumentor/phpdocumentor": "*",
-                "phpunit/phpunit": "4.3.*"
+                "phpunit/phpunit": "4.7.*"
+            },
+            "suggest": {
+                "league/oauth2-client": "Needed for Gmail's XOAUTH2 authentication system"
             },
             "type": "library",
-            "": {
+            "autoload": {
                 "classmap": [
                     "class.phpmailer.php",
+                    "class.phpmaileroauth.php",
+                    "class.phpmaileroauthgoogle.php",
+                    "class.smtp.php",
                     "class.pop3.php",
-                    "class.smtp.php"
+                    "extras/EasyPeasyICS.php",
+                    "extras/ntlm_sasl_client.php"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -106,7 +114,7 @@
                 }
             ],
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
-            "time": "2015-03-06 17:57:22"
+            "time": "2015-09-17 14:24:09"
         },
         {
             "name": "psr/log",
@@ -123,7 +131,7 @@
                 "shasum": ""
             },
             "type": "library",
-            "": {
+            "autoload": {
                 "psr-0": {
                     "Psr\\Log\\": ""
                 }
@@ -152,12 +160,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ruflin/Elastica.git",
-                "reference": "36165fbac7264c279db5b6d09792382846eb1879"
+                "reference": "deb60173c85bdf4fe328d5b863f9178669c4d86f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ruflin/Elastica/zipball/36165fbac7264c279db5b6d09792382846eb1879",
-                "reference": "36165fbac7264c279db5b6d09792382846eb1879",
+                "url": "https://api.github.com/repos/ruflin/Elastica/zipball/deb60173c85bdf4fe328d5b863f9178669c4d86f",
+                "reference": "deb60173c85bdf4fe328d5b863f9178669c4d86f",
                 "shasum": ""
             },
             "require": {
@@ -165,26 +173,24 @@
                 "psr/log": "~1.0"
             },
             "require-dev": {
-                "fabpot/php-cs-fixer": "~1.4",
-                "munkie/elasticsearch-thrift-php": "1.4.*",
-                "phpunit/phpunit": "4.1.*"
+                "guzzlehttp/guzzle": "5.3.*",
+                "munkie/elasticsearch-thrift-php": "1.4.*"
             },
             "suggest": {
                 "egeloen/http-adapter": "Allow using httpadapter transport",
-                "guzzlehttp/guzzle": "Allow using guzzle 4.x as the http transport (Requires php 5.4)",
+                "guzzlehttp/guzzle": "Allow using guzzle 5.3.x as the http transport (Requires php 5.4)",
                 "monolog/monolog": "Logging request",
                 "munkie/elasticsearch-thrift-php": "Allow using thrift transport"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.4.x-dev"
+                    "dev-master": "2.2.x-dev"
                 }
             },
-            "": {
+            "autoload": {
                 "psr-4": {
-                    "Elastica\\": "lib/Elastica/",
-                    "Elastica\\Test\\": "test/lib/Elastica/Test/"
+                    "Elastica\\": "lib/Elastica/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -203,7 +209,7 @@
                 "client",
                 "search"
             ],
-            "time": "2015-03-05 09:53:23"
+            "time": "2015-09-17 13:21:21"
         },
         {
             "name": "thijzer/romano",
@@ -223,7 +229,7 @@
                 "php": ">=5.3.3"
             },
             "type": "library",
-            "": {
+            "autoload": {
                 "psr-4": {
                     "Romano\\": "src/Romano/"
                 }
@@ -247,28 +253,32 @@
         },
         {
             "name": "twig/twig",
-            "version": "v1.18.0",
+            "version": "v1.22.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "4cf7464348e7f9893a93f7096a90b73722be99cf"
+                "reference": "b7fc2469fa009897871fb95b68237286fc54a5ad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/4cf7464348e7f9893a93f7096a90b73722be99cf",
-                "reference": "4cf7464348e7f9893a93f7096a90b73722be99cf",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/b7fc2469fa009897871fb95b68237286fc54a5ad",
+                "reference": "b7fc2469fa009897871fb95b68237286fc54a5ad",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.2.4"
+                "php": ">=5.2.7"
+            },
+            "require-dev": {
+                "symfony/debug": "~2.7",
+                "symfony/phpunit-bridge": "~2.7"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.18-dev"
+                    "dev-master": "1.22-dev"
                 }
             },
-            "": {
+            "autoload": {
                 "psr-0": {
                     "Twig_": "lib/"
                 }
@@ -300,7 +310,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2015-01-25 17:32:08"
+            "time": "2015-09-15 06:50:16"
         }
     ],
     "packages-dev": [],

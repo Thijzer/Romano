@@ -1,7 +1,7 @@
 {% for item in post %}
   <div class="well">
     <h3>
-      <a href="{{ meta.site }}blog/article/{{ item.id }}/{{ item.slug }}">{{ item.title }}</a>
+      <a href="/blog/article/{{ item.id }}/{{ item.slug }}">{{ item.title }}</a>
     </h3>
     <span>{{ 'lbl.poston'|lng }} {{ item.date }} by <a href="{{ meta.site }}blog/{{ item.author }}">{{ item.author }}</a>
     with {{ item.total_comments }} comments
