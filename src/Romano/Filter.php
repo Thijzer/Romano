@@ -16,13 +16,13 @@ Class Filter
 
     public static function urlise($input = null, $foreignChars = true, $remove = array(), $spacer = '-')
     {
-        $characters = array_merge(Array::$Chars['markUp'], Array::$Chars['specials'], $remove);
+        $characters = array_merge(Arrays::$Chars['markUp'], Arrays::$Chars['specials'], $remove);
 
         // Convert accented characters, and remove parentheses and apostrophes
         $input = str_replace($characters, '', $input);
 
         // we add the space char
-        if ($foreignChars === true) $chars = Array::$foreignChars;
+        if ($foreignChars === true) $chars = Arrays::$foreignChars;
 
         $chars['from'][] = ' ';
         $chars['to'][] = $spacer;

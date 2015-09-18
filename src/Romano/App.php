@@ -55,6 +55,7 @@ class Application extends Container
     public function buildProject()
     {
         $config = $this->getConfig();
+        $path['root'] = $config['root'];
         $path['app'] = $config['root'].'app/'.$config['app_env'].'/';
         $path['src'] = $config['root'].'src/Romano/';
         $path['app_config'] = $path['app'].'Config/';
