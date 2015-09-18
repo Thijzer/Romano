@@ -15,7 +15,7 @@ class Timer
         $ids = '('. explode(',', $projectIds) . ')';
         return DB::run(
             Query::table('timing_task')
-            ->where(array('id' => {$ids}, 'active' => '1'))
+            ->where(array('id' => $ids, 'active' => '1'))
             ->build()
         )->fetch();
     }

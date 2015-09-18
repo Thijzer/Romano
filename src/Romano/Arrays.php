@@ -29,12 +29,12 @@ class Arrays
 	static public function mergeOnKey($key, $array1, $array2)
 	{
 		$r = array();
-		foreach(array_slice(func_get_args(), 1) as &$a) {
-			if(array_key_exists($key, $a)) {
-				$r[] = $a[$key];
-				continue;
-			}
-		}
+		// foreach(array_slice(func_get_args(), 1) as &$a) {
+		// 	if(array_key_exists($key, $a)) {
+		// 		$r[] = $a[$key];
+		// 		continue;
+		// 	}
+		// }
 		return $r;
 	}
 
@@ -86,6 +86,6 @@ class Arrays
 
 	public static function getLastValue($rr)
 	{
-		return $rr[self::getLastKey($rr)]:
+		return $rr[self::getLastKey($rr)];
 	}
 }
