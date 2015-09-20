@@ -13,7 +13,7 @@
 
 $routes = array(
     // auto controller mode
-    '' => array('resource' => 'home@index'),
+    'home/index' => array('resource' => 'home@index'),
     '{model}/{controller}/$' => array('resource' => '{model}@{controller}'),
 );
 

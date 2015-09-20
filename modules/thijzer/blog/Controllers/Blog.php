@@ -15,7 +15,6 @@ class Blog extends Ctrlr
         $pages = $this->pagination($this->post->getRowCount(), 0, 4);
         $response['pages'] = $pages;
         $response['post'] = $this->post->getPosts($pages['limit'], $pages['offset']);
-        $response['titles'] = $this->post->getTitles();
         return $response;
     }
 
@@ -24,7 +23,7 @@ class Blog extends Ctrlr
         $id = (int) $this->param('id');
         $title = (string) $this->param('title');
 
-        if (!$this->post->exists($id)){
+        if (!$this->post->exists($id)) {
             Output::page(404, 'from article');
         }
 
@@ -35,7 +34,6 @@ class Blog extends Ctrlr
             Output::redirect($this->route['path'].'/'.$id.'/'.$slug);
         }
         return $response;
-
     }
 
     function recentArticles()
@@ -52,7 +50,7 @@ class Blog extends Ctrlr
             $response['post'] = $this->post->getArticlesFromUser($user);
             return $response;
         }
-        Output::page(404, 'from Usersbloggers');
+        Output::page(404);
     }
 
     function getArchivedArticles()

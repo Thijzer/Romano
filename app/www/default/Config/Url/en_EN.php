@@ -10,15 +10,10 @@
 * offer a alternative redirect of none is given.
 *
 */
-// $routes['pagination'] = array('resource' => 'home@index', 'route' => 'page/{page}');
-// $routes['blog_index'] = array('resource' => 'blog@index', 'route' => 'blog', 'nav_name' => 'blog');
-// $routes['blog_$users'] = array('resource' => 'blog@users', 'route' => 'blog/{user}');
-// $routes['collections'] = array('resource' => 'collection@index', 'route' => 'collections', 'nav_name' => 'collections');
-// $routes['collections_$type'] = array('resource' => 'collection@index', 'route' => 'collections/{type}', 'nav_name' => 'collections_$type');
 
 $routes = array(
     '' => array('resource' => 'home@index'),
-    'page/{page}' => array('resource' => 'home@index', 'rel' => 'nofollow'),
+    'page/{page}' => array('resource' => 'home@index', 'rel' => 'nofollow', 'params' => 1),
     'users/login' => array('name' => 'u_login', 'resource' => 'users@login', 'rel' => 'nofollow'),
     'login/facebook' => array('resource' => 'users@facebook', 'rel' => 'nofollow'),
     'login/fbaccess' => array('resource' => 'users@fbaccess', 'rel' => 'nofollow'),
@@ -28,27 +23,13 @@ $routes = array(
     'about' => array('resource' => 'home@about'),
     'contact' => array('resource' => 'home@contact'),
     'collections' => array('resource' => 'collection@index'),
-    'collections/{type}' => array('resource' => 'collection@index'),
+    'collections/{type}' => array('resource' => 'collection@type', 'template' => 'collection/index', 'params' => 1),
     'movies' => array('resource' => 'collection@movies', 'template' => 'collection/index'),
-    'movie/{title}' => array('resource' => 'collection@details'),
-    'blog/article/{id}/{title}' => array('resource' => 'blog@article'),
-    'blog/{user}' => array('resource' => 'blog@users'),
-    'testing/{text}' => array('resource' => 'testing@MainTest')
+    'movie/{title}' => array('resource' => 'collection@details', 'params' => 1),
+    'blog/article/{id}/{title}' => array('resource' => 'blog@article', 'params' => 1),
+    'blog/{user}' => array('resource' => 'blog@users', 'params' => 1),
+    'testing/{text}' => array('resource' => 'testing@MainTest', 'params' => 1),
 );
-
-
-// $urls['collection@index'][] = 'collections';
-// $urls['collection@index'][] = 'collections/{type}';
-// $urls['collection@index'][] = 'movies';
-// $urls['collection@details'][] = 'movie/{title}';
-// $urls['contact'] = '/contact';
-// $urls['movies'] = '/movies';
-// $urls['tvshows'] = '/tvshows';
-// $urls['login'] = '/login';
-// $urls['about'] = '/about';
-// $urls['lost'] = '/lost';
-// $urls['logout'] = '/logout';
-// $urls['collections'] = '/collections';
 
 $sibs = array(
     'movies' => array(

@@ -20,6 +20,7 @@ Lang::set(require path('lang'));
 // start routes
 $route = new Route($request);
 $routes = require path('routes');
+$application->buildURL($routes['routes']);
 
 if
 (
@@ -29,7 +30,6 @@ if
     ($result = $route->getTemplate())
 )
 {
-    $application->buildURL($routes['routes']);
     $view = $request->get('VIEW');
     //$track = Track::get()->fromClient();
 

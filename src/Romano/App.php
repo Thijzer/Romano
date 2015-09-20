@@ -78,12 +78,16 @@ class Application extends Container
     }
     public function buildURL($urlList)
     {
+        $app = '/';
+        $app .= ($this->defApp !== 'default') ? $this->defApp.'/' : '';
         foreach($urlList as $key => $route) {
-            if (isset($route['name'])) {
-                $tmp[$route['name']] = '/'.$key;
+            if (isset($route['params'])) {
+                preg_match_all('~{(.*?)}~', $key, $output);
+                $glu = implode('_', $output[1]);
+                $tmp[$route['resource']]['dynamic'][$glu] = $app.$key;
                 continue;
             }
-            $tmp[str_replace(array('{','}'), '', $key)] = '/'.$key;
+            $tmp[$route['resource']]['static'][] = $app.$key;
         }
         Container::set(array('url', $tmp));
     }
@@ -91,7 +95,7 @@ class Application extends Container
     {
         $app = $this->getParameter('app');
         $defHost = $this->getParameter('default_host');
-        $defApp  = $this->getParameter('default_app');
+        $this->defApp = $this->getParameter('default_app');
 
         // look into the hostname
         if (in_array($this->request->get('HTTP_HOST'), array_keys($app))) {
@@ -100,11 +104,11 @@ class Application extends Container
 
         // look into the url
         if (in_array($this->request->getURLSection(0), $app[$defHost])) {
-            $defApp = $this->request->getURLSection(0);
+            $this->defApp = $this->request->getURLSection(0);
             $this->request->removeURLsection(0);
         }
 
-        $appEnv = $defHost.'/'.$defApp;
+        $appEnv = $defHost.'/'.$this->defApp;
         $this->setConfigFile('app/'.$appEnv.'/Config/Settings.php');
 
         // we push the default view
@@ -161,7 +165,7 @@ class Container
     }
     public static function get(array $name)
     {
-        return self::$container[$name[0]][$name[1]];
+        return (isset(self::$container[$name[0]][$name[1]])) ? self::$container[$name[0]][$name[1]] : '';
     }
     public static function getParam(array $name)
     {
@@ -427,7 +431,7 @@ class Lang
     {
         list($type, $slug) = explode('.', $route, 2);
         if (!isset(self::$array[$type][$slug])) {
-            return '!! missing locale : '.$route;
+            return '!!! missing locale !!! : '.$route;
         }
         $respons = self::$array[$type][$slug];
         if (!empty($replacers)) {
@@ -436,7 +440,7 @@ class Lang
         return $respons;
     }
 
-    public static function set($locale)
+    public static function set(array $locale)
     {
         if (!self::$array) {
              self::$array = $locale;

@@ -16,6 +16,13 @@ Class Collection extends Ctrlr
         return $response;
     }
 
+    public function type()
+    {
+        $type = $this->params['type'];
+        $response['collection'] = $this->crud->select('collection_core', array('collection' => $type))->fetchAll();
+        return $response;
+    }
+
     public function movies()
     {
         $response['collection'] = $this->crud->select('collection_core', array('collection' => 'movies'))->fetchAll();

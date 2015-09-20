@@ -2,6 +2,13 @@
 
 class Testing
 {
+    public function urlTest()
+    {
+        dump(url('home@index'));
+        dump( url('js/jquery/jquery.min.js') );
+        dump(url('blog@article'));
+        dump(url('blog@article', ['ll','ff']));
+    }
 
     public function nr1($app)
     {
@@ -22,10 +29,10 @@ class Testing
         for ($i=0; $i < 5; $i++) {
             $q1 = Query::table('house')->save(array('title' => 'no', 'active' => 1, 'date' => 1234, 'id' => 34))->build();
         }
-        $app->set('stamp', 'test_end', timestamp(2) - $start); 
+        $app->set('stamp', 'test_end', timestamp(2) - $start);
 
         // $start = timestamp(2);
-        // for ($i=0; $i < 3; $i++) { 
+        // for ($i=0; $i < 3; $i++) {
         //     // $b = Query::table('house')->slowInsert(array('title', 'active', 'date', 'id'))->build();
         // }
         // $app->set('stamp', 'test_end2', timestamp(2) - $start);
