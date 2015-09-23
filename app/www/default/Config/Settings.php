@@ -30,9 +30,12 @@ return array(
             'FWRD' => 'donotreply@thijzer.com'
         ),
 
-        /* please do no switch your multi_language boolean in production */
+        /**
+         *   please do no switch your multi_language boolean in production
+         *   all te routes will change seo lost
+         */
 
-        'multi_language' => false,
+        'multi_language' => true,
         'default_language' => 'en',
 
         'extensions' => array(

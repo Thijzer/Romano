@@ -12,12 +12,14 @@ $request = new Request($_SERVER, $_REQUEST);
 // start Application Environment
 $application = new Application($request);
 $application->setRootDirectory(dirname(__DIR__).'/');
+
+// application is deturement from request
 $application->buildEnvironmentFromRequest();
 
 // setup locale language
 Lang::set(require path('lang'));
 
-// start routes
+// start Routes
 $route = new Route($request);
 $routes = require path('routes');
 $application->buildURL($routes['routes']);
