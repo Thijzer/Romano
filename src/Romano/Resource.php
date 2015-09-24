@@ -1,7 +1,6 @@
 <?php
 
 
-
 class Resource
 {
     private $storePath = '', $route = array(), $scope = array(), $block, $caviar = array(), $path, $baseFile = 'base.twig', $name, $lock = false;
@@ -15,8 +14,8 @@ class Resource
 
     public function __construct($route)
     {
-        $this->route =  $route;
-        $this->storePath = $this->route['path'];
+        $this->route = $route;
+        $this->storePath = $this->route['path_view'];
     }
 
     public function block($name)
@@ -66,21 +65,22 @@ class Resource
     public function getRender($engine, $render = "{# Generated file from Resource #}\n")
     {
         $root = path('cache') . path('theme_name').'/';
-        $store = $root . $this->storePath.'.twig';
+        $store = $root . $this->storePath;
         $render .= "{# ".date('l jS \of F Y h:i:s A')." #}\n\n";
 
-        if(DEV_ENV !== true && file_exists($store)) return $this->storePath.'.twig';
+        if (DEV_ENV !== true && file_exists($store)) {
+            return $this->storePath;
+        }
 
-        if ($options = $this->options[$engine])
-        {
-            if($this->baseFile)
-            {
+        if ($options = $this->options[$engine]) {
+            if ($this->baseFile) {
                 $render .= str_replace('$1', $this->baseFile, $options['extends']);
             }
-            if(!$this->block) exit('Resource :: we are missing html blocks');
+            if (!$this->block) {
+                exit('Resource :: we are missing html blocks');
+            }
 
-            foreach($this->block as $key => $block)
-            {
+            foreach ($this->block as $key => $block) {
                 $A = array('$1', '$2');
                 $B = array($key, Files::get($block, path('theme_view'), 'twig'));
                 $render .= str_replace($A, $B, $options['block']) . "\n";
@@ -90,14 +90,13 @@ class Resource
         }
         else exit('Select a proper render engine');
 
-        if(md5(Files::get($this->storePath, $root, 'twig')) !== md5($render))
-        {
+        if (md5(Files::get($this->storePath, $root, 'twig')) !== md5($render)) {
             Files::root($root);
             Files::collect($render);
-            Files::set($this->storePath, 'twig');
+            Files::set($this->storePath);
         }
 
-        return $this->storePath.'.twig';
+        return $this->storePath;
     }
 
     public function getScope()

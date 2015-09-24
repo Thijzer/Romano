@@ -10,9 +10,6 @@ class Route
     {
         $this->request = $request;
         $this->r['parameter'] = array();
-        $this->r['controller'] = '';
-        $this->r['method'] = '';
-        $this->r['path_view'] = '';
     }
 
     private function findRoute(array $routes)
@@ -26,27 +23,20 @@ class Route
         // reduce the list based on the first section
         $foundRoutes = (array) preg_grep("/{$this->request->getURLSection(0)}/i", array_keys($routes));
 
-        // auto controller
-        // if (isset($routes["{model}/{controller}/$"]) && count($foundRoutes) === 0) {
-        //     $class = $this->request->getURLSection(0);
-        //     $ctrlr = $this->request->getURLSection(1);
-        //     $index = $class.'/'.$ctrlr;
-        //     $routes[$index] =  array('resource' => $class.'@'.$ctrlr, 'rel' => 'nofollow');
-        //     $foundRoutes[] = $index;
-        // }
-
         foreach ($foundRoutes as $route) {
             if (count($param = explode('/', $route)) === $this->request->count('SECTIONS')) {
+
                 // string manipulation
                 preg_match_all("/\{(.*?)\}/i", $route, $matches);
-                    $value = str_replace($matches[0], '(.*)', $route);
 
-                    // now we know we have the count and the first part is ok
-                    if (preg_match('/' . str_replace('/', '\/', $value) . '$/', $this->request->get('URI'))) {
-                        $resource = $routes[$route];
-                        if ($matches[0]) $this->r['parameter'] = (array) $this->params($matches, $param);
-                        return $resource;
-                    }
+                $value = str_replace($matches[0], '(.*)', $route);
+
+                // now we know we have the count and the first part is ok
+                if (preg_match('/' . str_replace('/', '\/', $value) . '$/', $this->request->get('URI'))) {
+                    $resource = $routes[$route];
+                    if ($matches[0]) $this->r['parameter'] = (array) $this->params($matches, $param);
+                    return $resource;
+                }
             }
         }
         return array();
@@ -68,10 +58,11 @@ class Route
         }
         list($route['controller'], $route['method']) = explode('@', $route['resource']);
 
-        $route['path'] = (isset($route['template'])) ? $route['template']: $route['controller'].'/'.$route['method'];
-        $route['path_view'] = $route['path'].'.twig';
-        $route['path_resource'] = $route['path'].'.php';
-        $route['filename'] = $route['controller'].'-'.$route['method'];
+        $path = (isset($route['template'])) ?
+            $route['template']:
+            $route['controller'].'/'.$route['method'];
+        $route['path_view'] = $path.'.twig';
+        $route['path_resource'] = $path.'.php';
         $route['resource'] = $route['resource'];
         $this->r = array_merge($this->r, $route);
         Container::set('route', $this->r);
