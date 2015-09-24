@@ -1,5 +1,7 @@
 <?php
 
+
+
 class Crypt
 {
     static function toSalt($stringA = null, $stringB = null)

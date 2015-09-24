@@ -1,5 +1,7 @@
 <?php
 
+
+
 class Container
 {
     private static $container = array();
@@ -19,12 +21,13 @@ class Container
         return self::$container[$name[0]][$name[1]][$name[2]];
     }
 
-    public static function set(array $vars)
+    public static function set($key, array $values)
     {
-        if (!isset(self::$container[$vars[0]])) {
-            self::$container[$vars[0]] = array();
+        if (!isset(self::$container[$key])) {
+            self::$container[$key] = $values;
+            return;
         }
-        self::$container[$vars[0]] = array_merge(self::$container[$vars[0]], $vars[1]);
+        self::$container[$key] = array_merge(self::$container[$key], $values);
     }
 
     public static function setParam(array $vars)

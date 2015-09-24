@@ -6,6 +6,9 @@
 *
 *  added by Thijzer methods : icon, crop, store, getPath, getArray
 */
+
+
+
 class ResizeImage
 {
 

@@ -1,5 +1,7 @@
 <?php
 
+
+
 class Html
 {
     protected $example = array('input' => "<input *>", 'elem'  => "<%elem% *></%elem%>");

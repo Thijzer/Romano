@@ -1,5 +1,7 @@
 <?php
 
+
+
 class Lang
 {
     public static $array;

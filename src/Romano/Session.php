@@ -1,5 +1,7 @@
 <?php
 
+
+
 class Session
 {
     private static $token = '';

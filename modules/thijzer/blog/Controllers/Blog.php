@@ -4,7 +4,7 @@ class Blog extends Ctrlr
 {
     private $post;
 
-    function __construct()
+    public function __construct()
     {
         parent::__construct();
         $this->post = new Post();
@@ -18,42 +18,42 @@ class Blog extends Ctrlr
         return $response;
     }
 
-    function article()
+    public function article()
     {
-        $id = (int) $this->param('id');
+        $articleId = (int) $this->param('id');
         $title = (string) $this->param('title');
 
-        if (!$this->post->exists($id)) {
+        if (!$this->post->exists($articleId)) {
             Output::page(404, 'from article');
         }
 
-        $response['post'] = $this->post->getPost($id);
+        $response['post'] = $this->post->getPost($articleId);
         $slug = $response['post']['slug'];
 
         if ($slug !== $title) {
-            Output::redirect($this->route['path'].'/'.$id.'/'.$slug);
+            Output::redirect($this->route['path'].'/'.$articleId.'/'.$slug);
         }
         return $response;
     }
 
-    function recentArticles()
+    public function recentArticles()
     {
         $view['titles'] = $this->post->getTitles();
         return $view;
     }
 
-    function getAllArticlesFromUser()
+    public function getAllArticlesFromUser()
     {
         $user = (string) $this->params['user'];
 
-        if ($user){
+        if ($user) {
             $response['post'] = $this->post->getArticlesFromUser($user);
             return $response;
         }
         Output::page(404);
     }
 
-    function getArchivedArticles()
+    public function getArchivedArticles()
     {
         $response['archived'] = $this->post->getArchivedArticles();
         return $response;

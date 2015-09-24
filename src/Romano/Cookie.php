@@ -1,5 +1,7 @@
 <?php
 
+
+
 class Cookie
 {
     static function set($name, $data, $expiry)

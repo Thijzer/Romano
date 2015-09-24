@@ -14,6 +14,8 @@
 * three domains / view / grab / crud
 */
 
+
+
 class Auth
 {
 	private static $container = array();

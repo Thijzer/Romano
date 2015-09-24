@@ -1,5 +1,7 @@
 <?php
 
+
+
 class Input
 {
     private static $submit = array();

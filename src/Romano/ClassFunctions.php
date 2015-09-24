@@ -1,5 +1,7 @@
 <?php
 
+
+
 class ClassFunctions
 {
     function getInternalFunctions()

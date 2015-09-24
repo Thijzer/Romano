@@ -1,5 +1,7 @@
 <?php
 
+
+
 abstract class Singleton
 {
     private static $storage = array();

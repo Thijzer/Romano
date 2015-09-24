@@ -3,6 +3,9 @@
 /**
 * mini wrapper for simpler sending
 */
+
+
+
 class Send
 {
     static function mail($email, $subject, $body)

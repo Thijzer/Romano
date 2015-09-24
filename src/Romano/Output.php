@@ -1,5 +1,7 @@
 <?php
 
+
+
 class Output
 {
     private static $site = '';

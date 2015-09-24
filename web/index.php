@@ -10,11 +10,11 @@ if (isset($_SERVER['APP_ENV']) && $_SERVER['APP_ENV'] === 'dev') {
 $request = new Request($_SERVER, $_REQUEST);
 
 // start Application Environment
-$application = new Application($request);
-$application->setRootDirectory(dirname(__DIR__).'/');
+$application = new Application();
+$application->setRootConfiguration(dirname(__DIR__), 'settings/globals.php');
 
 // application is deturement from request
-$application->buildEnvironmentFromRequest();
+$application->buildEnvironmentFromRequest($request);
 
 // setup locale language
 Lang::set(require path('lang'));

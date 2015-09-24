@@ -1,5 +1,7 @@
 <?php
 
+
+
 Class Parse
 {
     static $rule = array('key' => 'parser_cache'),

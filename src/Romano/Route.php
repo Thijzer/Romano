@@ -1,5 +1,7 @@
 <?php
 
+
+
 class Route
 {
     private $request;
@@ -70,7 +72,7 @@ class Route
         // we need to move this to the tracker
         $this->r['previous_uri'] = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
         $this->r['resource'] = $route['resource'];
-        Container::set(array('route', $this->r));
+        Container::set('route', $this->r);
         return true;
     }
     public function getController()

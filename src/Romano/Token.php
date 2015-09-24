@@ -2,6 +2,9 @@
 /**
 * moved to Crypt
 */
+
+
+
 class Token
 {
 	public static function generate()
