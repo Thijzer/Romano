@@ -35,7 +35,7 @@ return array(
          *   all te routes will change seo lost
          */
 
-        'multi_language' => true,
+        'multi_language' => false,
         'default_language' => 'en',
 
         'extensions' => array(

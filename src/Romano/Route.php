@@ -1,11 +1,11 @@
 <?php
 
 
-
 class Route
 {
     private $request;
     private $r = array();
+
     public function __construct(Request $request)
     {
         $this->request = $request;
@@ -14,6 +14,7 @@ class Route
         $this->r['method'] = '';
         $this->r['path_view'] = '';
     }
+
     private function findRoute(array $routes)
     {
         // home
@@ -22,17 +23,17 @@ class Route
         }
         unset($routes['']);
 
-        // reduce the list look for first index
+        // reduce the list based on the first section
         $foundRoutes = (array) preg_grep("/{$this->request->getURLSection(0)}/i", array_keys($routes));
 
         // auto controller
-        if (isset($routes["{model}/{controller}/$"]) && count($foundRoutes) === 0) {
-            $class = $this->request->getURLSection(0);
-            $ctrlr = $this->request->getURLSection(1);
-            $index = $class.'/'.$ctrlr;
-            $routes[$index] =  array('resource' => $class.'@'.$ctrlr, 'rel' => 'nofollow');
-            $foundRoutes[] = $index;
-        }
+        // if (isset($routes["{model}/{controller}/$"]) && count($foundRoutes) === 0) {
+        //     $class = $this->request->getURLSection(0);
+        //     $ctrlr = $this->request->getURLSection(1);
+        //     $index = $class.'/'.$ctrlr;
+        //     $routes[$index] =  array('resource' => $class.'@'.$ctrlr, 'rel' => 'nofollow');
+        //     $foundRoutes[] = $index;
+        // }
 
         foreach ($foundRoutes as $route) {
             if (count($param = explode('/', $route)) === $this->request->count('SECTIONS')) {
@@ -50,6 +51,7 @@ class Route
         }
         return array();
     }
+
     private function params($matches, $param)
     {
         foreach ($matches[0] as $key => $match) {
@@ -57,24 +59,25 @@ class Route
         }
         return $par;
     }
+
     public function search(array $routes)
     {
         $route = $this->findRoute($routes);
         if (!$route) {
             return false;
         }
-        list($this->r['controller'], $this->r['method']) = explode('@', $route['resource']);
+        list($route['controller'], $route['method']) = explode('@', $route['resource']);
 
-        $this->r['path'] = (isset($route['template'])) ? $route['template']: $this->r['controller'].'/'.$this->r['method'];
-        $this->r['path_view'] = $this->r['path'].'.twig';
-        $this->r['path_resource'] = $this->r['path'].'.php';
-        $this->r['filename'] = $this->r['controller'].'-'.$this->r['method'];
-        // we need to move this to the tracker
-        $this->r['previous_uri'] = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
-        $this->r['resource'] = $route['resource'];
+        $route['path'] = (isset($route['template'])) ? $route['template']: $route['controller'].'/'.$route['method'];
+        $route['path_view'] = $route['path'].'.twig';
+        $route['path_resource'] = $route['path'].'.php';
+        $route['filename'] = $route['controller'].'-'.$route['method'];
+        $route['resource'] = $route['resource'];
+        $this->r = array_merge($this->r, $route);
         Container::set('route', $this->r);
         return true;
     }
+
     public function getController()
     {
         $class = ucfirst($this->r['controller']);
@@ -88,6 +91,7 @@ class Route
             );
         }
     }
+
     public function getTemplate()
     {
         if (file_exists(path('theme_view').$this->r['path_view']) || file_exists(path('theme_cache').$this->r['path_view'])) {
@@ -97,6 +101,7 @@ class Route
             );
         }
     }
+
     public function getResource()
     {
         $resource = path('resource').$this->r['path_resource'];
