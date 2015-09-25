@@ -53,18 +53,16 @@ class Route
     public function search(array $routes)
     {
         $route = $this->findRoute($routes);
-        if (!$route) {
+        if (!isset($route['resource'])) {
             return false;
         }
         list($route['controller'], $route['method']) = explode('@', $route['resource']);
 
-        $path = (isset($route['template'])) ?
-            $route['template']:
-            $route['controller'].'/'.$route['method'];
-        $route['path_view'] = $path.'.twig';
-        $route['path_resource'] = $path.'.php';
-        $route['resource'] = $route['resource'];
+        $route['template'] = (isset($route['template'])) ?: $route['controller'].'/'.$route['method'];
+        $route['path_view'] = $route['template'].'.twig';
+        $route['path_resource'] = $route['template'].'.php';
         $this->r = array_merge($this->r, $route);
+
         Container::set('route', $this->r);
         return true;
     }
