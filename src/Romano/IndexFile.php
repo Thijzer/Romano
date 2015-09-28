@@ -3,13 +3,14 @@
 class IndexFile
 {
     private $index;
-    private $filename = '.index.json';
+    public $filename = '.index.json';
     private $indexedFiles;
 
-    function __construct($rootDirectory, $root)
+    public function __construct($root, $directory)
     {
-        $this->directory = rtrim($root, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
-        $this->index = new File($rootDirectory.$this->filename);
+        $this->directory = rtrim($directory, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
+        $this->root = rtrim($root, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
+        $this->index = new File($this->root.$this->filename);
         $this->indexedFiles = (array) json_decode($this->index->getContent(), true);
     }
 
@@ -18,7 +19,7 @@ class IndexFile
         $foundFiles = [];
         // @TODO filter
         foreach ($this->indexedFiles as $indexedFile) {
-            $file = $this->indexUnlock($indexedFile);
+            $file = $this->unlockFile($indexedFile);
             $foundFiles[$file->getHash()] = $file;
         }
         return $foundFiles;
@@ -27,21 +28,22 @@ class IndexFile
     public function getFile($filename)
     {
         foreach ($this->indexedFiles as $indexedFile) {
-            $file = $this->indexUnlock($indexedFile);
+            $file = $this->unlockFile($indexedFile);
             if ($file->getBasename() === $filename) {
                 return $file;
             }
         }
     }
 
+    public function save()
+    {
+        $this->index->setContent($this->getContent());
+        $this->index->save();
+    }
+
     public function add(File $file)
     {
         $this->indexedFiles[$file->getHash()] = $this->indexKey($file);
-    }
-
-    public function save()
-    {
-        $this->index->save(json_encode($this->indexedFiles));
     }
 
     public function getContent()
@@ -61,11 +63,11 @@ class IndexFile
         );
     }
 
-    private function indexUnlock($indexedFile)
+    private function unlockFile($indexedFile)
     {
         list($nBitHash, $directory, $basename) = explode('|||', $indexedFile);
         return new File(
-            $directory.DIRECTORY_SEPARATOR.$basename,
+            $this->root.$basename,
             null,
             $nBitHash
         );

@@ -12,27 +12,27 @@ class File
     private $mimetype;
     private $hash;
     private $oldHash;
+    private $filesizeFormat;
+    private $filesize;
+    private $isFile;
 
-    function __construct($fullPath, $content = null, $hash = null)
+    public function __construct($fullPath, $content = null, $oldHash = null)
     {
-        $file = pathinfo($fullPath);
+        $pathinfo = pathinfo($fullPath);
         $this->fullPath = $fullPath;
-        $this->directory = $file['dirname'];
-        $this->extension = (isset($file['extension']))? $file['extension']: '';
-        $this->basename = $file['basename'];
-        $this->filename = $file['filename'];
+        $this->directory = @$pathinfo['dirname'];
+        $this->extension = @$pathinfo['extension'];
+        $this->basename = @$pathinfo['basename'];
+        $this->filename = @$pathinfo['filename'];
+        $this->oldHash = $oldHash;
+        $isFile = ($oldHash !== null);
         $this->content = $content;
-        $this->oldHash = $hash;
-        if ($content) {
-            $this->getHash();
-        }
     }
 
     public function getContent()
     {
         if (!$this->content) {
             $this->content = @file_get_contents($this->fullPath);
-            $this->hash = nBitHash($this->content);
         }
         return $this->content;
     }
@@ -70,18 +70,6 @@ class File
         return $this->basename;
     }
 
-    public function moveTo($location)
-    {
-        if (!is_dir($location)) {
-            return;
-        }
-        $this->fullPath = $location;
-        rename(
-            $this->fullPath,
-            DIRECTORY_SEPARATOR.trim($location, '/').DIRECTORY_SEPARATOR.$this->basename
-        );
-    }
-
     public function getMimeType()
     {
         if (!$this->mimetype) {
@@ -89,24 +77,42 @@ class File
             $this->mimetype = finfo_file($this->fullPath);
             finfo_close($finfo);
         }
-
         return $this->mimetype;
     }
 
-    public function save($content = null)
+    public function getSizeInBytes()
     {
-        // ovewrite
-        if ($content !== null) {
-            $this->setContent($content);
+        if (!is_file($this->fullPath)) {
+            return; # File is still in memory
         }
+        if (!$this->filesize) {
+            clearstatcache(); # required
+            $this->filesize = filesize($this->fullPath);
+        }
+        return $this->filesize;
+    }
 
-        if ($this->oldHash !== nBitHash($this->getContent())) {
-            $file = fopen($this->fullPath, "w+");
-            if (!$file) {
+    public function getFilesize($decimals = 2)
+    {
+        if (!$this->filesizeFormat) {
+            $bytes = $this->getSizeInBytes();
+            $size = array("Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB");
+            $factor = floor((strlen($bytes) - 1) / 3);
+            $this->filesizeFormat = sprintf("%.{$decimals}f", $bytes / pow(1024, $factor));
+            $this->filesizeFormat .= ' '.@$size[$factor];
+        }
+        return $this->filesizeFormat;
+    }
+
+    public function save()
+    {
+        if ($this->oldHash !== $this->gethash()) {
+            $localFile = fopen($this->getFullPath(), "w+");
+            if (!$localFile) {
                 return; # no access
             }
-            fwrite($file, $this->getContent());
-            fclose($file);
+            fwrite($localFile, $this->getContent());
+            fclose($localFile);
         }
     }
 }

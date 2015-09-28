@@ -22,18 +22,21 @@ class Testing extends Ctrlr
         $fs = new FileSystem(path('cache'), 'test');
 
         //dump($fs->exists('testnames.txt'));
-        dump($fs->find('testnames.txt'));
+        //dump($fs->find('testnames.txt'));
         stamp('find');
-        $fs->scan();
+        //$fs->scan();
         stamp('scan');
 
-        $fs->add('new_testnames.txt', 'painisss');
+        //$fs->add('new_testnames.txt', 'painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss');
         //$fs->store();
 
         //dump($fs->exists('testnames.txt'));
         dump($fs->exists('testnames.txt'));
         dump($fs->get('testnames.txt'));
         $file = $fs->get('new_testnames.txt');
+
+        dump($file->getSizeInBytes());
+        dump($file->getFilesize());
 
         stamp('newfile');
         dump($file->getcontent());

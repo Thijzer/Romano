@@ -6,9 +6,9 @@ class FileSystem
     private $directory;
     private $rootDirectory;
     private $files;
-    private $systemFiles = array('.', '..', '.index.json');
+    private $systemFiles = array('.', '..');
 
-    function __construct($rootDirectory, $directory)
+    public function __construct($rootDirectory, $directory)
     {
         $this->rootDirectory = rtrim($rootDirectory, DIRECTORY_SEPARATOR);
         $this->directory = $this->rootDirectory.DIRECTORY_SEPARATOR;
@@ -17,6 +17,9 @@ class FileSystem
             $this->mkdir($this->directory);
         }
         $this->indexFile = new IndexFile($this->directory, $directory);
+
+        // add your index file filename to the system Files
+        $this->systemFiles[] = $this->indexFile->filename;
         return $this;
     }
 
