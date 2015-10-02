@@ -1,12 +1,12 @@
 <?php
 
-class FileSystem
+class FileManager
 {
     private $indexFile;
     private $directory;
     private $rootDirectory;
-    private $files;
-    private $systemFiles = array('.', '..');
+    private $files = [];
+    private $systemFiles = ['.DS_Store', '@eaDir'];
 
     public function __construct($rootDirectory, $directory)
     {
@@ -16,7 +16,7 @@ class FileSystem
         if (!is_dir($this->directory)) {
             $this->mkdir($this->directory);
         }
-        $this->indexFile = new IndexFile($this->directory, $directory);
+        $this->indexFile = new IndexFile($this->directory);
 
         // add your index file filename to the system Files
         $this->systemFiles[] = $this->indexFile->filename;
@@ -25,12 +25,18 @@ class FileSystem
 
     public function scan()
     {
-        foreach (array_diff(scandir($this->directory), $this->systemFiles) as $filename) {
+        $foundFiles = array_diff(array_filter(scandir($this->directory), function($item) {
+            return !is_dir($this->directory . $item);
+        }), $this->systemFiles);
+
+        foreach ($foundFiles as $filename) {
             $file = new File($this->directory.$filename);
+            $file->getFilesize();
+            $file->getMimeType();
             $this->files[$filename] = $file;
             $this->indexFile->add($file);
         }
-        return $this->files;
+        return $this;
     }
 
     public function find($query)
@@ -52,19 +58,13 @@ class FileSystem
 
     public function move($directory)
     {
-        if (!is_dir($directory)) {
-            return;
+        if (is_dir($directory) && strpos($directory, $this->$rootDirectory) !== false) {
+            return rename($this->directory, $directory);
         }
-        // directory
-        $this->directory = $directory;
-        $this->store();
     }
 
     public function mkdir($directory)
     {
-        if (!is_dir($directory)) {
-            return;
-        }
         mkdir($directory);
         return $this;
     }
@@ -78,6 +78,7 @@ class FileSystem
 
     public function store()
     {
+        echo "store";
         foreach ($this->files as $file) {
             $file->save();
             $this->indexFile->add($file);
@@ -85,7 +86,7 @@ class FileSystem
         $this->indexFile->save();
     }
 
-    public function compare(File $file1, File $file2)
+    public function isIndentical(File $file1, File $file2)
     {
         return ($file1->getHash() === $file2->getHash());
     }

@@ -16,32 +16,28 @@ class Testing extends Ctrlr
 
     public function FileTest()
     {
-        dump(path('cache'));
+        $fm = new FileManager(path('cache'), 'wallpapers');
 
-        stamp('A');
-        $fs = new FileSystem(path('cache'), 'test');
-
-        //dump($fs->exists('testnames.txt'));
-        //dump($fs->find('testnames.txt'));
-        stamp('find');
-        //$fs->scan();
-        stamp('scan');
+        //dump($fm->exists('testnames.txt'));
+        dump($fm->find('Amazing'));
+        //$fm->scan();
 
         //$fs->add('new_testnames.txt', 'painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss');
-        //$fs->store();
 
-        //dump($fs->exists('testnames.txt'));
-        dump($fs->exists('testnames.txt'));
-        dump($fs->get('testnames.txt'));
-        $file = $fs->get('new_testnames.txt');
 
-        dump($file->getSizeInBytes());
-        dump($file->getFilesize());
+        //dump($fm->exists('testnames.txt'));
+        //dump($fm->exists('testnames.txt'));
+        //dump($fm->get('testnames.txt'));
+        //$file = $fm->get('new_testnames.txt');
 
-        stamp('newfile');
-        dump($file->getcontent());
+        // dump($file->getBasename());
+        // dump($file->getMimeType());
+        // dump($file->getFilesize());
 
-        stamp('C');
+        //$fm->store();
+        stamp("end_test");
+        // dump($file->getcontent());
+        // dump($file->basename);
 
         dump(Container::getAll('stamp'), 'time stamps');
     }
