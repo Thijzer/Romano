@@ -1,45 +1,43 @@
 <?php
 
-class File
+class File extends SPLFileInfo
 {
     private $fullPath;
-    private $directory;
-    private $extension;
-    private $filename;
     private $content;
-    /* filename + extension */
-    public $basename;
-    public $mimetype;
     private $hash;
-    private $oldHash;
     private $filesizeFormat;
+    private $mimetype;
+
     public $filesize;
-    private $isFile;
+    public $filename;
 
     public function __construct($fullPath, $content = null, $properties = null)
     {
+        parent::__construct($fullPath);
+
         if (is_array($properties)) {
             foreach ($properties as $key => $value) {
                 $this->{$key} = $value;
             }
         }
-
-        $pathinfo = pathinfo($fullPath);
+        $this->filename = $this->getFilename();
         $this->fullPath = $fullPath;
-        $this->directory = @$pathinfo['dirname'];
-        $this->extension = @$pathinfo['extension'];
-        $this->basename = @$pathinfo['basename'];
-        $this->filename = @$pathinfo['filename'];
-        $this->isFile = ($this->oldHash !== null);
         $this->content = $content;
     }
 
-    public function exsists()
+    public function exists()
     {
-        if (!$this->isFile) {
-            $this->isFile = is_file($this->fullPath);
-        }
-        return $this->isFile;
+        return $this->isfile();
+    }
+
+    public function getFullPath()
+    {
+        return $this->fullPath;
+    }
+
+    public function getFullPathHash()
+    {
+        return nbitHash($this->fullPath);
     }
 
     public function getContent()
@@ -58,38 +56,20 @@ class File
 
     public function setHash()
     {
-        if (!$this->oldHash) {
-            $this->oldHash = nBitHash($this->getContent());
+        if (!$this->hash) {
+            $this->getHash();
         }
+        return $this;
     }
 
     public function getHash()
     {
-        if (!$this->hash && $this->exsists()) {
-            return $this->oldHash;
+        // hashes of memory content should not be returned
+        if ($this->hash && $this->exists()) {
+            return $this->hash;
         }
         $this->hash = nBitHash($this->getContent());
         return $this->hash;
-    }
-
-    public function getExtension()
-    {
-        return $this->extension;
-    }
-
-    public function getDirectory()
-    {
-        return $this->directory;
-    }
-
-    public function getFullPath()
-    {
-        return $this->fullPath;
-    }
-
-    public function getBasename()
-    {
-        return $this->basename;
     }
 
     public function getMimeType()
@@ -104,7 +84,7 @@ class File
 
     public function getSizeInBytes()
     {
-        if (!$this->exsists()) {
+        if (!$this->exists()) {
             return; # File is still in memory
         }
         if (!$this->filesize) {
@@ -128,16 +108,17 @@ class File
 
     public function save()
     {
-        if ($this->content && $this->oldHash !== $this->gethash()) {
-            echo $this->filename;
-            dump($this->oldHash);
-            dump($this->hash);
-            // $localFile = fopen($this->getFullPath(), "w+");
-            // if (!$localFile) {
-            //     return; # no access
-            // }
-            // fwrite($localFile, $this->getContent());
-            // fclose($localFile);
+        $oldHash = $this->hash;
+        $newhash = $this->gethash();
+        if (!empty($this->content) && ($oldHash !== $newhash)) {
+            # try block
+            echo "string ".$this->filename;
+            $localFile = fopen($this->fullPath, 'w+');
+            if (!$localFile) {
+                return; # no access
+            }
+            fwrite($localFile, $this->getContent());
+            fclose($localFile);
         }
     }
 }

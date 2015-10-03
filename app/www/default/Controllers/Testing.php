@@ -16,11 +16,16 @@ class Testing extends Ctrlr
 
     public function FileTest()
     {
-        $fm = new FileManager(path('cache'), 'wallpapers');
+        // $file = new File(path('cache').'test/testname.txt');
+        $fm = new FileManager(path('cache'), 'paco');
 
+        // dump($file->exsists());
+        // dump($file->getExtension());
+        // dump($file->getMimeType());
         //dump($fm->exists('testnames.txt'));
-        dump($fm->find('Amazing'));
-        //$fm->scan();
+
+        $fm->scan()->store();
+        dump($fm->find('044', '056'));
 
         //$fs->add('new_testnames.txt', 'painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss, painisss');
 
@@ -28,13 +33,12 @@ class Testing extends Ctrlr
         //dump($fm->exists('testnames.txt'));
         //dump($fm->exists('testnames.txt'));
         //dump($fm->get('testnames.txt'));
-        //$file = $fm->get('new_testnames.txt');
+        $file = $fm->get('SAM_1044.JPG');
 
         // dump($file->getBasename());
-        // dump($file->getMimeType());
-        // dump($file->getFilesize());
+        //dump($file->getMimeType());
+        dump($file->getFullPath());
 
-        //$fm->store();
         stamp("end_test");
         // dump($file->getcontent());
         // dump($file->basename);

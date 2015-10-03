@@ -10,38 +10,36 @@ class IndexFile
     {
         $this->directory = rtrim($directory, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
         $this->index = new File($this->directory.$this->filename);
-        $this->index->setHash();
     }
 
     public function getIndexedFiles()
     {
         if (!$this->indexedFiles) {
-            $foundFiles = [];
-            $indexFiles = (array) @json_decode($this->index->getContent(), true);
-            foreach ($indexFiles as $key => $indexFile) {
-                $file = $this->unlockFile($key, $indexFile);
-                $foundFiles[$this->indexKey($file)] = $file;
-            }
-            $this->indexedFiles = $foundFiles;
+            $this->index->setHash(); # we need to set it's previous hash
+            $this->indexedFiles = (array) @json_decode($this->index->getContent(), true);
         }
         return $this->indexedFiles;
     }
 
-    public function getFile($filename)
+    public function getFile($filename, $type = 'filename')
     {
-        foreach ($this->getIndexedFiles() as $file) {
-            if ($file->getBasename() === $filename) {
-                return $file;
-            }
-        }
+        $fullPathHash = nBitHash($this->directory.$filename);
+        return (isset($this->getIndexedFiles()[$fullPathHash])) ?
+            $this->getIndexedFiles()[$fullPathHash]:
+            ''; # exception file not found
     }
 
-    public function find($query)
+    public function find($needles, $sensitive = true, $offset = 0)
     {
         $result = [];
-        foreach ($this->getIndexedFiles() as $file) {
-            if (strpos($file->basename, $query)) {
-                $result[] = $file;
+        foreach ($this->getIndexedFiles() as $fileInfo) {
+            foreach ($needles as $needle) {
+                $isFound = ($sensitive) ?
+                    (strpos($fileInfo['filename'], $needle, $offset) !== false) :
+                    (stripos($fileInfo['filename'], $needle, $offset) !== false);
+                if ($isFound) {
+                    $result[] =  $this->returnFile($fileInfo);
+                }
             }
         }
         return $result;
@@ -49,37 +47,21 @@ class IndexFile
 
     public function save()
     {
-        $this->index->setContent($this->getContent())->save();
+        $this->index->setContent(json_encode($this->getIndexedFiles()))->save();
     }
 
     public function add(File $file)
     {
-        $this->indexedFiles[$this->indexKey($file)] = $file;
+        # convert obj to array and store
+        $this->indexedFiles[$file->getFullPathHash()] = json_decode(json_encode($file), true);
     }
 
-    public function getContent()
+    private function returnFile(array $fileInfo)
     {
-        return json_encode($this->getIndexedFiles());
-    }
-
-    private function indexKey(File $file)
-    {
-        return join(
-            '|||',
-            [
-                $file->getHash(),
-                $file->basename,
-            ]
-        );
-    }
-
-    private function unlockFile($key, $indexedFile)
-    {
-        list($nBitHash, $basename) = explode('|||', $key);
         return new File(
-            $this->directory.$basename,
+            $this->directory.$fileInfo['filename'],
             null,
-            $indexedFile+['oldHash' => $nBitHash]
+            $fileInfo
         );
     }
 }
