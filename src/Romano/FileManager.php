@@ -35,7 +35,7 @@ class FileManager
     public function scan()
     {
         $indexFile = $this->indexFile();
-        $foundFiles = array_diff(array_filter(scandir($this->directory), function($item) {
+        $foundFiles = array_diff(array_filter(scandir($this->directory), function ($item) {
             return !is_dir($this->directory . $item);
         }), $this->systemFiles);
 
@@ -77,7 +77,7 @@ class FileManager
         }
     }
 
-    private function sortBy($newIndex)
+    public function sortBy($newIndex)
     {
         foreach ($this->files as $value) {
             $tmp[$value[$newIndex]] = $value;

@@ -112,7 +112,6 @@ class File extends SPLFileInfo
         $newhash = $this->gethash();
         if (!empty($this->content) && ($oldHash !== $newhash)) {
             # try block
-            echo "string ".$this->filename;
             $localFile = fopen($this->fullPath, 'w+');
             if (!$localFile) {
                 return; # no access

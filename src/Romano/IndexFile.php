@@ -21,7 +21,7 @@ class IndexFile
         return $this->indexedFiles;
     }
 
-    public function getFile($filename, $type = 'filename')
+    public function getFile($filename)
     {
         $fullPathHash = nBitHash($this->directory.$filename);
         return (isset($this->getIndexedFiles()[$fullPathHash])) ?
