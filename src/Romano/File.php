@@ -7,8 +7,8 @@ class File extends SPLFileInfo
     private $hash;
     private $filesizeFormat;
     private $mimetype;
+    private $filesize;
 
-    public $filesize;
     public $filename;
 
     public function __construct($fullPath, $content = null, $properties = null)
@@ -106,11 +106,17 @@ class File extends SPLFileInfo
         return trim($this->filesizeFormat);
     }
 
+    public function remove($filename)
+    {
+        unlink($filename);
+        return null;
+    }
+
     public function save()
     {
         $oldHash = $this->hash;
-        $newhash = $this->gethash();
-        if (!empty($this->content) && ($oldHash !== $newhash)) {
+        $newHash = $this->gethash();
+        if (!empty($this->content) && ($oldHash !== $newHash)) {
             # try block
             $localFile = fopen($this->fullPath, 'w+');
             if (!$localFile) {

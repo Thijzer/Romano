@@ -3,8 +3,11 @@
 class IndexFile
 {
     private $index;
+    private $files;
+
     public $filename = '.index.json';
-    private $indexedFiles;
+    public $isChanged = false;
+    public $changedFiles;
 
     public function __construct($directory)
     {
@@ -12,27 +15,27 @@ class IndexFile
         $this->index = new File($this->directory.$this->filename);
     }
 
-    public function getIndexedFiles()
+    public function getFiles()
     {
-        if (!$this->indexedFiles) {
+        if (!$this->files) {
             $this->index->setHash(); # we need to set it's previous hash
-            $this->indexedFiles = (array) @json_decode($this->index->getContent(), true);
+            $this->files = (array) @json_decode($this->index->getContent(), true);
         }
-        return $this->indexedFiles;
+        return $this->files;
     }
 
     public function getFile($filename)
     {
         $fullPathHash = nBitHash($this->directory.$filename);
-        return (isset($this->getIndexedFiles()[$fullPathHash])) ?
-            $this->getIndexedFiles()[$fullPathHash]:
+        return (isset($this->getFiles()[$fullPathHash])) ?
+            $this->returnFile($this->getFiles()[$fullPathHash]):
             ''; # exception file not found
     }
 
     public function find($needles, $sensitive = true, $offset = 0)
     {
         $result = [];
-        foreach ($this->getIndexedFiles() as $fileInfo) {
+        foreach ($this->getFiles() as $fileInfo) {
             foreach ($needles as $needle) {
                 $isFound = ($sensitive) ?
                     (strpos($fileInfo['filename'], $needle, $offset) !== false) :
@@ -47,13 +50,22 @@ class IndexFile
 
     public function save()
     {
-        $this->index->setContent(json_encode($this->getIndexedFiles()))->save();
+        $this->index->setContent(json_encode($this->getFiles()))->save();
     }
 
     public function add(File $file)
     {
         # convert obj to array and store
-        $this->indexedFiles[$file->getFullPathHash()] = json_decode(json_encode($file), true);
+        $hash = $file->getFullPathHash();
+        $this->isChanged = true;
+        $this->changedFiles[$hash] = $file;
+        $this->files[$hash] = json_decode(json_encode($file), true);
+    }
+
+    public function remove(File $file)
+    {
+        $hash = $file->getFullPathHash();
+        unset($this->files[$hash]);
     }
 
     private function returnFile(array $fileInfo)

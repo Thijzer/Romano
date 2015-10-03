@@ -4,29 +4,26 @@ class FileManager
 {
     private $indexFile;
     private $directory;
-    private $fileChanged = [];
-    private $rootDirectory;
-    private $files = [];
     private $systemFiles = ['.DS_Store', '@eaDir'];
 
-    public function __construct($rootDirectory, $directory)
+    public function __construct($directory)
     {
-        $this->rootDirectory = rtrim($rootDirectory, DIRECTORY_SEPARATOR);
-        $this->directory = $this->rootDirectory.DIRECTORY_SEPARATOR;
-        $this->directory .= rtrim($directory, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
+        $this->directory = rtrim($directory, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
 
         if (!is_dir($this->directory)) {
-            $this->mkdir($this->directory);
+            mkdir($this->directory);
+
+            # prep the directory
+            #$this->scan()->store();
         }
-        return $this;
     }
 
-    public function indexFile()
+    private function indexFile()
     {
         if (!$this->indexFile) {
             $this->indexFile = new IndexFile($this->directory);
 
-            // add your index file filename to the system Files
+            // add your indexfile filename to the system Files
             $this->systemFiles[] = $this->indexFile->filename;
         }
         return $this->indexFile;
@@ -34,16 +31,21 @@ class FileManager
 
     public function scan()
     {
-        $indexFile = $this->indexFile();
-        $foundFiles = array_diff(array_filter(scandir($this->directory), function ($item) {
-            return !is_dir($this->directory . $item);
-        }), $this->systemFiles);
+        if (!$indexFile = $this->indexFile()) {
+            $foundFiles = array_diff(array_filter(scandir($this->directory), function ($item) {
+                return !is_dir($this->directory.$item);
+            }), $this->systemFiles);
 
-        foreach ($foundFiles as $filename) {
-            $file = new File($this->directory.$filename);
-            $file->getFilesize(); # index the files as well
-            $this->files[$filename] = $file;
-            $indexFile->add($file);
+            $files = Arrays::indexBy('filename', $indexFile->getFiles());
+            $newFiles = array_diff($foundFiles, array_keys($files));
+            $removedFiles = array_diff(array_keys($files), $foundFiles);
+
+            foreach ($newFiles as $filename) {
+                $indexFile->add(new File($this->directory.$filename));
+            }
+            foreach ($removedFiles as $filename) {
+                $indexFile->remove(new File($this->directory.$filename));
+            }
         }
         return $this;
     }
@@ -55,61 +57,59 @@ class FileManager
 
     public function get($filename)
     {
+        if ($file = $this->indexFile()->getFile($filename)) {
+            return $file;
+        }
         $file = new File($this->directory . $filename);
         if ($file->exists()) {
             return $file;
         }
-        return (isset($this->files[$filename])) ?
-            $this->files[$filename]:
-            $this->indexFile()->getFile($filename);
+        # not found
     }
 
     public function exists($filename)
     {
-        $file = new File($this->directory . $filename);
-        return ($file->exists());
+        return !empty($this->get($filename));
     }
 
     public function move($directory)
     {
-        if (is_dir($directory)) {
+        if (is_dir($directory) && !$this->indexFile()->isChanged) {
             return rename($this->directory, $directory);
         }
-    }
-
-    public function sortBy($newIndex)
-    {
-        foreach ($this->files as $value) {
-            $tmp[$value[$newIndex]] = $value;
-        }
-        return $tmp;
-    }
-
-    public function mkdir($directory)
-    {
-        mkdir($directory);
-        return $this;
     }
 
     public function add($filename, $content)
     {
         $file = new File($this->directory.$filename, $content);
-        $this->files[$filename] = $file;
-        $this->fileChanged[] = $filename;
         $this->indexFile()->add($file);
+    }
+
+    public function remove($filename)
+    {
+        if ($file = $this->get($filename)) {
+            $file->remove();
+            $this->indexFile()->remove($file);
+        }
     }
 
     public function store()
     {
-        if ($this->fileChanged) {
-            foreach ($this->files as $file) {
-                if (in_array($file->filename, array_keys($this->fileChanged))) {
-                    $this->indexFile()->add($file);
-                    $file->save();
-                }
+        if ($this->indexFile()->isChanged) {
+            $files = $this->indexFile()->changedFiles;
+            foreach ($files as $file) {
+                $file->save();
             }
             $this->indexFile()->save();
         }
+        return $this;
+    }
+
+    // File System
+
+    public function addFile(File $file)
+    {
+        $this->indexFile()->add($file);
     }
 
     public function isIndentical(File $file1, File $file2)
