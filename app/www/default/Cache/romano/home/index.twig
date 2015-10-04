@@ -1,11 +1,10 @@
-{# Generated file from Resource #}
-{# Wednesday 16th of September 2015 09:48:39 PM #}
+{# Generated file from Resource :: October 2015 #}
 
 {% extends "base.twig" %}{% block content %}
 {% for item in post %}
   <div class="well">
     <h3>
-      <a href="{{ meta.site }}blog/article/{{ item.id }}/{{ item.slug }}">{{ item.title }}</a>
+      <a href="/blog/article/{{ item.id }}/{{ item.slug }}">{{ item.title }}</a>
     </h3>
     <span>{{ 'lbl.poston'|lng }} {{ item.date }} by <a href="{{ meta.site }}blog/{{ item.author }}">{{ item.author }}</a>
     with {{ item.total_comments }} comments
@@ -18,23 +17,35 @@
   <ul class="pagination">
 
     <li {% if (pages.prev < 1) %}class="disabled">{% else %}>
-      <a href="{{ pages.url }}/{{ pages.prev }}" aria-label="{{ pages.prev_lbl }}">{% endif %}
+      <a href="{{ pages.url }}{{ pages.page }}{{ pages.prev }}" aria-label="{{ pages.prev_lbl }}">{% endif %}
         <span aria-hidden="true">&laquo;</span>
       </a>
     </li>
 
-    {% for page in 1..pages.num_pages %}
-        {% if (page == 1) %}
-            <li><a href="/">{{ page }}</a></li>
-        {% elseif (page == pages.requested_page) %}
-            <li class="active"><a href="{{ page }}">{{ page }}</a></li>
-        {% else %}
-            <li><a href="{{ pages.url }}/{{ page }}">{{ page }}</a></li>
+    {% set maxpage = pages.requested_page+4 %}
+    {% set minpage = pages.num_pages-4 %}
+
+    {% for i in 1..pages.num_pages %}
+
+        {% if (i == 1) %}
+            <li><a href="{{ pages.url }}">{{ i }}</a></li>
+
+        {% elseif (i == pages.requested_page) %}
+            <li class="active"><a href="{{ i }}">{{ i }}</a></li>
+
+        {% elseif (i > pages.requested_page and i < maxpage)  %}
+            <li><a href="{{ pages.url }}{{ pages.page }}{{ i }}">{{ i }}</a></li>
+        {% elseif (i < pages.requested_page and i > minpage)  %}
+            <li><a href="{{ pages.url }}{{ pages.page }}{{ i }}">{{ i }}</a></li>
+
+        {% elseif (i == pages.num_pages)  %}
+            <li><a href="{{ pages.url }}{{ pages.page }}{{ i }}">{{ i }}</a></li>
         {% endif %}
+
     {% endfor %}
 
     <li {% if (pages.next > pages.num_pages) %}class="disabled">{% else %}>
-      <a href="{{ pages.url }}/{{ pages.next }}" aria-label="{{ pages.next_lbl }}">{% endif %}
+      <a href="{{ pages.url }}{{ pages.page }}{{ pages.next }}" aria-label="{{ pages.next_lbl }}">{% endif %}
         <span aria-hidden="true">&raquo;</span>
       </a>
     </li>

@@ -23,6 +23,10 @@ class FileManager
         if (!$this->indexFile) {
             $this->indexFile = new IndexFile($this->directory);
 
+            if (empty($this->indexFile->getFiles())) {
+                $this->scan()->store();
+            }
+
             // add your indexfile filename to the system Files
             $this->systemFiles[] = $this->indexFile->filename;
         }
@@ -31,22 +35,23 @@ class FileManager
 
     public function scan()
     {
-        if (!$indexFile = $this->indexFile()) {
-            $foundFiles = array_diff(array_filter(scandir($this->directory), function ($item) {
-                return !is_dir($this->directory.$item);
-            }), $this->systemFiles);
+        $indexFile = $this->indexFile();
 
-            $files = Arrays::indexBy('filename', $indexFile->getFiles());
-            $newFiles = array_diff($foundFiles, array_keys($files));
-            $removedFiles = array_diff(array_keys($files), $foundFiles);
+        $foundFiles = array_diff(array_filter(scandir($this->directory), function ($item) {
+            return !is_dir($this->directory.$item);
+        }), $this->systemFiles);
 
-            foreach ($newFiles as $filename) {
-                $indexFile->add(new File($this->directory.$filename));
-            }
-            foreach ($removedFiles as $filename) {
-                $indexFile->remove(new File($this->directory.$filename));
-            }
+        $files = Arrays::indexBy('filename', $indexFile->getFiles());
+        $newFiles = array_diff($foundFiles, array_keys($files));
+        $removedFiles = array_diff(array_keys($files), $foundFiles);
+
+        foreach ($newFiles as $filename) {
+            $indexFile->add(new File($this->directory.$filename));
         }
+        foreach ($removedFiles as $filename) {
+            $indexFile->remove(new File($this->directory.$filename));
+        }
+
         return $this;
     }
 
@@ -62,6 +67,7 @@ class FileManager
         }
         $file = new File($this->directory . $filename);
         if ($file->exists()) {
+            $this->addFile($file);
             return $file;
         }
         # not found
@@ -69,12 +75,15 @@ class FileManager
 
     public function exists($filename)
     {
-        return !empty($this->get($filename));
+        return !empty(@$this->get($filename));
     }
 
     public function move($directory)
     {
-        if (is_dir($directory) && !$this->indexFile()->isChanged) {
+        if ($this->indexFile()->isChanged) {
+            $this->store();
+        }
+        if (is_dir($directory)) {
             return rename($this->directory, $directory);
         }
     }
@@ -83,13 +92,14 @@ class FileManager
     {
         $file = new File($this->directory.$filename, $content);
         $this->indexFile()->add($file);
+        return $this;
     }
 
     public function remove($filename)
     {
         if ($file = $this->get($filename)) {
-            $file->remove();
             $this->indexFile()->remove($file);
+            $file->remove();
         }
     }
 
@@ -103,6 +113,21 @@ class FileManager
             $this->indexFile()->save();
         }
         return $this;
+    }
+
+    public function getFileCount()
+    {
+        return count($this->indexFile()->getFiles());
+    }
+
+    public function getFiles($limit = 0, $offset = 0)
+    {
+        $tmp = [];
+        $files = array_slice($this->indexFile()->getFiles(), $offset, $limit);
+        foreach ($files as $key => $file) {
+            $tmp[$key] = $this->indexFile()->returnFile($file);
+        }
+        return $tmp;
     }
 
     // File System

@@ -15,7 +15,7 @@ abstract class Ctrlr
         return $this->params[$name];
     }
 
-    function pagination($rowCount, $offset, $limit)
+    function pagination($rowCount, $offset, $limit, $page = '?page=')
     {
         $requestedPage = 1;
         if (!isset($this->params['page'])) {
@@ -38,7 +38,11 @@ abstract class Ctrlr
         $options['requested_page'] = $requestedPage;
         $options['prev'] = $requestedPage-1;
         $options['next'] = $requestedPage+1;
-        $options['url'] = '/page';
+        $options['url'] = '/';
+        if (strpos($page, '?') !== false) {
+            $options['url'] .= $this->route['url'];
+        }
+        $options['page'] = $page;
         $options['next_lbl'] = Lang::get('lbl.next');
         $options['prev_lbl'] = Lang::get('lbl.prev');
         $options['offset'] = ($options['requested_page'] * $options['limit']) - $options['limit'];

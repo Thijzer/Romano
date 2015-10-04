@@ -16,7 +16,6 @@ class Testing extends Ctrlr
     public function fileTest()
     {
         // $file = new File(path('cache').'test/testname.txt');
-        $fm = new FileManager(path('cache').'paco');
 
         // dump($file->exsists());
         // dump($file->getExtension());
@@ -24,7 +23,13 @@ class Testing extends Ctrlr
         //dump($fm->exists('testnames.txt'));
 
         //$fm->scan();
-        //$files = $fm->find('044', '056');
+        //$files = $fm->getAll('044', '056');
+
+        $fm = new FileManager(path('cache').'paco');
+        $pages = $this->pagination($fm->getFileCount(), 0, 4);
+        $response['pages'] = $pages;
+        $response['files'] = $fm->getAll($pages['limit'], $pages['offset']);
+        return $response;
 
         //dump($files);
 
@@ -33,7 +38,9 @@ class Testing extends Ctrlr
         //dump($fm->exists('testnames.txt'));
         //dump($fm->exists('testnames.txt'));
         //dump($fm->get('testnames.txt'));
-        $file = $fm->get('SAM_1044.JPG');
+        //$file = $fm->get('SAM_0446.JPG');
+
+        //$fm->addFile($file);
         //
         //$fm->add('_test.txt', 'testing');
         //
@@ -43,7 +50,9 @@ class Testing extends Ctrlr
 
         // dump($file->getBasename());
         //dump($file->getMimeType());
-        dump($file);
+        //dump($files);
+
+        dump(array_slice($files, 0, 30));
 
         stamp("end_test");
         // dump($file->getcontent());

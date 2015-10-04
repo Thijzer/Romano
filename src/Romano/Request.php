@@ -20,6 +20,8 @@ class Request
             $this->req['VIEW'] = $parts['extension'];
             $this->req['SECTIONS'] = explode('/', $this->req['URI']);
         }
+
+        parse_str($server['QUERY_STRING'], $this->req['PARAMS']);
     }
 
     public function get($name)

@@ -12,7 +12,7 @@ class Blog extends Ctrlr
 
     public function index()
     {
-        $pages = $this->pagination($this->post->getRowCount(), 0, 4);
+        $pages = $this->pagination($this->post->getRowCount(), 0, 4, 'page/');
         $response['pages'] = $pages;
         $response['post'] = $this->post->getPosts($pages['limit'], $pages['offset']);
         return $response;

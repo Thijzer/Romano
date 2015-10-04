@@ -35,6 +35,7 @@ class Route
                 if (preg_match('/' . str_replace('/', '\/', $value) . '$/', $this->request->get('URI'))) {
                     $resource = $routes[$route];
                     if ($matches[0]) $this->r['parameter'] = (array) $this->params($matches, $param);
+                    $this->r['parameter'] = array_merge($this->request->get('PARAMS'), $this->r['parameter']);
                     return $resource;
                 }
             }
@@ -60,6 +61,7 @@ class Route
 
         $route['template'] = (isset($route['template'])) ?: $route['controller'].'/'.$route['method'];
         $route['path_view'] = $route['template'].'.twig';
+        $route['url'] = $this->request->get('URI');
         $route['path_resource'] = $route['template'].'.php';
         $this->r = array_merge($this->r, $route);
 

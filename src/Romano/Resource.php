@@ -1,6 +1,5 @@
 <?php
 
-
 class Resource
 {
     private $storePath = '', $route = array(), $scope = array(), $block, $caviar = array(), $path, $baseFile = 'base.twig', $name, $lock = false;
@@ -8,7 +7,8 @@ class Resource
         'twig' => array(
             'extends' => '{% extends "$1" %}',
             'block' => "{% block $1 %}\n$2{% endblock %}",
-            'include' => '{% include "$1" %}'
+            'include' => '{% include "$1" %}',
+            'comment' => "{# $1 #}\n\n",
         )
     );
 
@@ -62,17 +62,20 @@ class Resource
         $this->storePath = $path;
     }
 
-    public function getRender($engine, $render = "{# Generated file from Resource #}\n")
+    public function getRender($engine, $comment = "Generated file from Resource")
     {
         $root = path('cache') . path('theme_name').'/';
         $store = $root . $this->storePath;
-        $render .= "{# ".date('l jS \of F Y h:i:s A')." #}\n\n";
 
         if (DEV_ENV !== true && file_exists($store)) {
             return $this->storePath;
         }
 
         if ($options = $this->options[$engine]) {
+
+            $comment .= ' :: '.date('F Y');
+            $render = str_replace('$1', $comment, $options['comment']);
+
             if ($this->baseFile) {
                 $render .= str_replace('$1', $this->baseFile, $options['extends']);
             }
@@ -81,19 +84,31 @@ class Resource
             }
 
             foreach ($this->block as $key => $block) {
-                $A = array('$1', '$2');
-                $B = array($key, Files::get($block, path('theme_view'), 'twig'));
-                $render .= str_replace($A, $B, $options['block']) . "\n";
-            }
-            //return $render;
-            if ($this->lock === true) $render .= "\n" . '{# locked #}';
-        }
-        else exit('Select a proper render engine');
 
-        if (md5(Files::get($this->storePath, $root, 'twig')) !== md5($render)) {
-            Files::root($root);
-            Files::collect($render);
-            Files::set($this->storePath);
+                $tmp = '';
+                foreach ($block as $segment) {
+                    $blok = new File(path('theme_view').$segment.'.twig');
+                    $tmp .= $blok->getContent();
+                }
+                $render .= str_replace(
+                    ['$1', '$2'],
+                    [$key, $tmp],
+                    $options['block']
+                ) . "\n";
+            }
+            if ($this->lock === true) {
+                $render .= str_replace('$1', 'locked', $options['comment']);;
+            }
+        } else {
+            exit('Select a proper render engine');
+        }
+
+        $file = new file($root. $this->storePath);
+        if (!$file->exists()) {
+            mkdir($file->getDirectory());
+            $file->setContent($render)->save();
+        } elseif ($file->getHash() !== crc32b($render)) {
+            $file->setContent($render)->save();
         }
 
         return $this->storePath;

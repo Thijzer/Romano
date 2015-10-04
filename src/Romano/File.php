@@ -4,11 +4,10 @@ class File extends SPLFileInfo
 {
     private $fullPath;
     private $content;
-    private $hash;
     private $filesizeFormat;
     private $mimetype;
-    private $filesize;
 
+    public $filesize;
     public $filename;
 
     public function __construct($fullPath, $content = null, $properties = null)
@@ -37,15 +36,12 @@ class File extends SPLFileInfo
 
     public function getFullPathHash()
     {
-        return nbitHash($this->fullPath);
+        return crc32b($this->fullPath);
     }
 
     public function getContent()
     {
-        if (!$this->content) {
-            return @file_get_contents($this->fullPath);
-        }
-        return $this->content;
+        return (!$this->content) ? @file_get_contents($this->fullPath) : $this->content;
     }
 
     public function setContent($content)
@@ -54,22 +50,9 @@ class File extends SPLFileInfo
         return $this;
     }
 
-    public function setHash()
-    {
-        if (!$this->hash) {
-            $this->getHash();
-        }
-        return $this;
-    }
-
     public function getHash()
     {
-        // hashes of memory content should not be returned
-        if ($this->hash && $this->exists()) {
-            return $this->hash;
-        }
-        $this->hash = nBitHash($this->getContent());
-        return $this->hash;
+        return crc32b($this->getContent());
     }
 
     public function getMimeType()
@@ -94,6 +77,11 @@ class File extends SPLFileInfo
         return $this->filesize;
     }
 
+    public function getDirectory()
+    {
+        return pathinfo($this->fullPath, PATHINFO_DIRNAME);
+    }
+
     public function getFilesize($decimals = 2)
     {
         if (!$this->filesizeFormat) {
@@ -103,27 +91,26 @@ class File extends SPLFileInfo
             $this->filesizeFormat = sprintf("%.{$decimals}f", $bytes / pow(1024, $factor));
             $this->filesizeFormat .= ' ' . @$size[$factor];
         }
-        return trim($this->filesizeFormat);
+        return $this->filesizeFormat;
     }
 
     public function remove($filename)
     {
-        unlink($filename);
+        $this->content = null;
+        unlink($this->fullPath);
         return null;
     }
 
     public function save()
     {
-        $oldHash = $this->hash;
-        $newHash = $this->gethash();
-        if (!empty($this->content) && ($oldHash !== $newHash)) {
-            # try block
-            $localFile = fopen($this->fullPath, 'w+');
-            if (!$localFile) {
-                return; # no access
+        if (!empty($this->content)) {
+            try {
+                $localFile = fopen($this->fullPath, 'w+');
+                fwrite($localFile, $this->getContent());
+                fclose($localFile);
+            } catch (Exception $e) {
+                die($e);
             }
-            fwrite($localFile, $this->getContent());
-            fclose($localFile);
         }
     }
 }

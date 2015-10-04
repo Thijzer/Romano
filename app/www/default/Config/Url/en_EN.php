@@ -29,6 +29,7 @@ $routes = array(
     'blog/article/{id}/{title}' => array('resource' => 'blog@article', 'params' => 1),
     'blog/{user}' => array('resource' => 'blog@users', 'params' => 1),
     'testing/{text}' => array('resource' => 'testing@MainTest', 'params' => 1),
+    'files/{file}' => array('resource' => 'files@index', 'params' => 1),
 );
 
 $sibs = array(

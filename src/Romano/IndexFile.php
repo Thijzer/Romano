@@ -18,7 +18,6 @@ class IndexFile
     public function getFiles()
     {
         if (!$this->files) {
-            $this->index->setHash(); # we need to set it's previous hash
             $this->files = (array) @json_decode($this->index->getContent(), true);
         }
         return $this->files;
@@ -26,7 +25,7 @@ class IndexFile
 
     public function getFile($filename)
     {
-        $fullPathHash = nBitHash($this->directory.$filename);
+        $fullPathHash = crc32b($this->directory.$filename);
         return (isset($this->getFiles()[$fullPathHash])) ?
             $this->returnFile($this->getFiles()[$fullPathHash]):
             ''; # exception file not found
@@ -59,16 +58,18 @@ class IndexFile
         $hash = $file->getFullPathHash();
         $this->isChanged = true;
         $this->changedFiles[$hash] = $file;
+        $file->getFileSize();
         $this->files[$hash] = json_decode(json_encode($file), true);
     }
 
     public function remove(File $file)
     {
         $hash = $file->getFullPathHash();
+        $this->isChanged = true;
         unset($this->files[$hash]);
     }
 
-    private function returnFile(array $fileInfo)
+    public function returnFile(array $fileInfo)
     {
         return new File(
             $this->directory.$fileInfo['filename'],

@@ -43,7 +43,7 @@ class Arrays
     public static function indexBy($newIndex, array $files)
     {
         if (!isset($files[0][$newIndex])) {
-            return; # code...
+            return [];
         }
         foreach ($files as $value) {
             $tmp[$value[$newIndex]] = $value;
