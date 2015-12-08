@@ -27,12 +27,11 @@ class Blog extends Ctrlr
             Output::page(404, 'from article');
         }
 
-        $response['post'] = $this->post->getPost($articleId);
-        $slug = $response['post']['slug'];
-
-        if ($slug !== $title) {
-            Output::redirect($this->route['path'].'/'.$articleId.'/'.$slug);
+        $post = $this->post->getPost($articleId);
+        if ($post['slug'] !== $title) {
+            Output::redirect($this->route['path'].'/'.$articleId.'/'.$post['slug']);
         }
+        $response['post'] = $post;
         return $response;
     }
 

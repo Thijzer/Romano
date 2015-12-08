@@ -1,10 +1,6 @@
 <?php
-require '../globals.php';
 
-if (isset($_SERVER['APP_ENV']) && $_SERVER['APP_ENV'] === 'dev') {
-  require 'settings/dev.php';
-  stamp('Application');
-}
+require '../bootstrap.php';
 
 // start Request
 $request = new Request($_SERVER, $_REQUEST);
@@ -12,26 +8,11 @@ $request = new Request($_SERVER, $_REQUEST);
 // start Application Environment
 $application = new Application();
 $application->setRootConfiguration(dirname(__DIR__), 'settings/globals.php');
-
-// application is deturement from request
 $application->buildEnvironmentFromRequest($request);
-
-// setup locale language
-Lang::set(require path('lang'));
 
 // start Routes
 $route = new Route($request);
-$routes = require path('routes');
-$application->buildURL($routes['routes']);
-
-if
-(
-    ($route->search($routes['routes'])) &&
-    ($result = $route->getResource()) ||
-    ($result = $route->getController()) ||
-    ($result = $route->getTemplate())
-)
-{
+if (($route->search($application->getRoutes())) && ($result = $route->getResource())) {
     $view = $request->get('VIEW');
     //$track = Track::get()->fromClient();
 

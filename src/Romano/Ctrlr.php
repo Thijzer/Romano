@@ -1,7 +1,5 @@
 <?php
 
-
-
 abstract class Ctrlr
 {
     function __construct()
@@ -32,7 +30,7 @@ abstract class Ctrlr
             $options['num_pages'] = 1;
         }
         if ($requestedPage > $options['num_pages'] || $requestedPage < 1) {
-            Output::redirect(404);
+            Output::page(404);
         }
 
         $options['requested_page'] = $requestedPage;

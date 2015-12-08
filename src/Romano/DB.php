@@ -1,7 +1,5 @@
 <?php
 
-
-
 class DB extends \PDO
 {
     /**
@@ -49,14 +47,15 @@ class DB extends \PDO
 
     public function fetch()
     {
-        return $this->stmt->fetch($this->fetchMode);
+        $result = $this->stmt->fetch($this->fetchMode);
+        return $result;
     }
 
     public function fetchAllBy($value)
     {
         $results = $this->stmt->fetchAll($this->fetchMode);
         foreach ($results as $result) {
-            $tmp[$result['id']] = $result;
+            $tmp[$result[$value]] = $result;
         }
         return $tmp;
     }
@@ -79,7 +78,8 @@ class DB extends \PDO
 
     public function fetchAll()
     {
-        return $this->stmt->fetchAll($this->fetchMode);
+        $results = $this->stmt->fetchAll($this->fetchMode);
+        return $results;
     }
 
     public function fetchPairs($a, $b)

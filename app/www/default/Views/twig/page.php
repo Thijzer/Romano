@@ -1,32 +1,45 @@
 <?php
 
-switch ($data['code']) {
-  case '404':
-    header('HTTP/1.0 404 Not Found');
+if ($data) {
     $error = 'Page Not Found';
     $info = "We couldn't find the page you requested on our servers.";
     $button = "return to the homepage";
-    break;
-  case '500':
-    header('HTTP/1.1 500 Internal Server Error');
-    $error = 'Internal Server Error';
-    $info = "Nope that is not so good";
-    $button = "return to the homepage";
-    break;
-  case '1012':
-    header('HTTP/1.1 1012 Access to restricted URI denied');
-    $error = 'Access to Restricted URI Denied';
-    $info = '';
-    $button = '';
     $butloc = '';
-    break;
-  case '401':
-    header("HTTP/1.1 401 Unauthorized");
-    $error = 'Unauthorized Access';
-    $info = "We need you to sign in again, in order to access this page.";
-    $button = "Please Log in";
-    $butloc = 'login';
-    break; 
+    $code = 404;
+    switch ($data['code']) {
+      case '404':
+        header('HTTP/1.0 404 Not Found');
+        $error = 'Page Not Found';
+        $info = "We couldn't find the page you requested on our servers.";
+        $button = "return to the homepage";
+        $butloc = '';
+        $code = 404;
+        break;
+      case '500':
+        header('HTTP/1.1 500 Internal Server Error');
+        $error = 'Internal Server Error';
+        $info = "Nope that is not so good";
+        $button = "return to the homepage";
+        $butloc = '';
+        $code = 500;
+        break;
+      case '1012':
+        header('HTTP/1.1 1012 Access to restricted URI denied');
+        $error = 'Access to Restricted URI Denied';
+        $info = '';
+        $button = '';
+        $butloc = '';
+        $code = 1012;
+        break;
+      case '401':
+        header("HTTP/1.1 401 Unauthorized");
+        $error = 'Unauthorized Access';
+        $info = "We need you to sign in again, in order to access this page.";
+        $button = "Please Log in";
+        $butloc = 'login';
+        $code = 401;
+        break;
+    }
 }
 
 ?>
@@ -87,14 +100,14 @@ switch ($data['code']) {
                 text-align: center;
               }
             }
-        </style>   
+        </style>
     </head>
     <body>
     <div class="container">
-        <h1><?php echo 'Error '. $data['code'] . ' : ' . $error; ?></h1>
+        <h1><?php echo 'Error '. $code . ' : ' . $error; ?></h1>
         <hr>
         <p><?php echo $info; ?></p>
-        <a class="" href="<?php echo site.$butloc; ?>"><?php echo $button; ?></a>
+        <a class="" href="/<?php echo $butloc; ?>"><?php echo $button; ?></a>
     </div>
     </body>
 </html>

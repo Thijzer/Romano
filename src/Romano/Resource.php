@@ -2,7 +2,14 @@
 
 class Resource
 {
-    private $storePath = '', $route = array(), $scope = array(), $block, $caviar = array(), $path, $baseFile = 'base.twig', $name, $lock = false;
+    private $storePath = '';
+    private $scope = array();
+    private $render;
+    private $blocks;
+    private $caviar = array();
+    private $baseFile = 'default.twig';
+    private $name;
+    private $lock = false;
     private $options = array(
         'twig' => array(
             'extends' => '{% extends "$1" %}',
@@ -12,10 +19,17 @@ class Resource
         )
     );
 
-    public function __construct($route)
+    public function __construct($pathView, $engine)
     {
-        $this->route = $route;
-        $this->storePath = $this->route['path_view'];
+        if (!isset($this->options[$engine])) {
+            leave('select a proper render engine like twig');
+        }
+        $this->isDev = (DEV_ENV !== true);
+        $this->storePath = $pathView;
+        $this->options = $this->options[$engine];
+        $comment = "Generated file from Resource";
+        $comment .= ' :: '.date('F Y');
+        $this->render = str_replace('$1', $comment, $this->options['comment']);
     }
 
     public function block($name)
@@ -27,23 +41,24 @@ class Resource
     public function setBaseFile($baseFile)
     {
         $this->baseFile = $baseFile;
+        return $this;
     }
 
-    public function scope($re) // we need to move it to render
+    public function scope($controller)
     {
-        if(isset($this->scope[$re])) {
-          return $this->scope[$re];
+        if (isset($this->scope[$controller])) {
+            return $this->scope[$controller];
         }
 
-        list($ctrl, $method) = explode('@', $re);
+        list($ctrl, $method) = explode('@', $controller);
         if (is_callable($class = ucfirst($ctrl), $method)) {
             $class = new $class();
             $this->index[$ctrl] = $class;
-            $this->scope[$re] = (array) $class->$method();
-            $this->caviar = array_merge($this->caviar, $this->scope[$re]);
+            $this->scope[$controller] = (array) $class->$method();
+            $this->caviar = array_merge($this->caviar, $this->scope[$controller]);
             return $this;
         }
-        die('resoure@scope undefined method passed');
+        leave('undefined scope '.$controller.' passed');
     }
 
     public function addToScope($name, $scope)
@@ -53,7 +68,8 @@ class Resource
 
     public function html($path)
     {
-        $this->block[$this->name][] = $path;
+        $blockPart = new File(path('view').$path.'.twig');
+        $this->blocks[$this->name][] = $blockPart;
         return $this;
     }
 
@@ -62,53 +78,45 @@ class Resource
         $this->storePath = $path;
     }
 
-    public function getRender($engine, $comment = "Generated file from Resource")
+    public function render()
     {
-        $root = path('cache') . path('theme_name').'/';
-        $store = $root . $this->storePath;
-
-        if (DEV_ENV !== true && file_exists($store)) {
+        $baseCacheFile = new File(path('view_cache'). $this->storePath);
+        if ($this->isDev && $baseCacheFile->exists()) {
             return $this->storePath;
         }
 
-        if ($options = $this->options[$engine]) {
-
-            $comment .= ' :: '.date('F Y');
-            $render = str_replace('$1', $comment, $options['comment']);
-
-            if ($this->baseFile) {
-                $render .= str_replace('$1', $this->baseFile, $options['extends']);
-            }
-            if (!$this->block) {
-                exit('Resource :: we are missing html blocks');
-            }
-
-            foreach ($this->block as $key => $block) {
-
-                $tmp = '';
-                foreach ($block as $segment) {
-                    $blok = new File(path('theme_view').$segment.'.twig');
-                    $tmp .= $blok->getContent();
-                }
-                $render .= str_replace(
-                    ['$1', '$2'],
-                    [$key, $tmp],
-                    $options['block']
-                ) . "\n";
-            }
-            if ($this->lock === true) {
-                $render .= str_replace('$1', 'locked', $options['comment']);;
-            }
-        } else {
-            exit('Select a proper render engine');
+        if (!$this->blocks) {
+            leave('no html blocks defined');
         }
 
-        $file = new file($root. $this->storePath);
-        if (!$file->exists()) {
-            mkdir($file->getDirectory());
-            $file->setContent($render)->save();
-        } elseif ($file->getHash() !== crc32b($render)) {
-            $file->setContent($render)->save();
+        $this->render .= str_replace('$1', $this->baseFile, $this->options['extends']);
+
+        if ($this->lock === true) {
+            $this->render .= str_replace('$1', 'locked', $this->options['comment']);
+        }
+
+        foreach ($this->blocks as $key => $block) {
+            $tmp = '';
+            foreach ($block as $blockPart) {
+                if (!$blockPart->exists()) {
+                    leave($blockPart->filename.' is not a real block');
+                }
+                $tmp .= $blockPart->getContent();
+            }
+            $this->render .= str_replace(
+                ['$1', '$2'],
+                [$key, $tmp],
+                $this->options['block']
+            ) . "\n";
+        }
+
+        if (!$baseCacheFile->exists()) {
+            if (!is_dir($baseCacheFile->getDirectory())) {
+                mkdir($baseCacheFile->getDirectory());
+            }
+            $baseCacheFile->setContent($this->render)->save();
+        } elseif ($baseCacheFile->getHash() !== crc32b($this->render)) {
+            $baseCacheFile->setContent($this->render)->save();
         }
 
         return $this->storePath;

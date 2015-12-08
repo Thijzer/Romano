@@ -43,6 +43,4 @@ return array(
         ),
 
         'view' => 'twig',
-
-        'theme' => 'romano',
 );

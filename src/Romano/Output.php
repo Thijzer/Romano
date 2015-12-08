@@ -1,7 +1,5 @@
 <?php
 
-
-
 class Output
 {
     private static $site = '';
@@ -14,6 +12,6 @@ class Output
     public static function page($code)
     {
         $data = array('code' => $code);
-        require path('theme_view') . 'page.php';
+        require path('view') . 'page.php';
     }
 }

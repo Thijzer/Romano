@@ -10,6 +10,7 @@ class Route
     {
         $this->request = $request;
         $this->r['parameter'] = array();
+        $this->r['path_view'] = '';
     }
 
     private function findRoute(array $routes)
@@ -59,7 +60,7 @@ class Route
         }
         list($route['controller'], $route['method']) = explode('@', $route['resource']);
 
-        $route['template'] = (isset($route['template'])) ?: $route['controller'].'/'.$route['method'];
+        $route['template'] = (isset($route['template'])) ?: $route['controller'].'_'.$route['method'];
         $route['path_view'] = $route['template'].'.twig';
         $route['url'] = $this->request->get('URI');
         $route['path_resource'] = $route['template'].'.php';
@@ -69,23 +70,9 @@ class Route
         return true;
     }
 
-    public function getController()
-    {
-        $class = ucfirst($this->r['controller']);
-        $method = $this->r['method'];
-
-        if (is_callable(array($class, $method))) {
-            $class = new $class();
-            return array(
-                'data' => (array) $class->$method($this->request),
-                'path' => $this->r['path_view']
-            );
-        }
-    }
-
     public function getTemplate()
     {
-        if (file_exists(path('theme_view').$this->r['path_view']) || file_exists(path('theme_cache').$this->r['path_view'])) {
+        if (is_file(path('view_cache').$this->r['path_view']) || is_file(path('view').$this->r['path_view'])) {
             return array(
                 'path' => $this->r['path_view'],
                 'data' => array()
@@ -97,11 +84,11 @@ class Route
     {
         $resource = path('resource').$this->r['path_resource'];
 
-        if (file_exists($resource)) {
-            $res = new Resource($this->r);
+        if (is_file($resource)) {
+            $res = new Resource($this->r['path_view'], 'twig');
             require $resource;
             return array(
-                'path' => $res->getRender('twig'),
+                'path' => $res->render(),
                 'data' => (array) $res->getScope()
             );
         }

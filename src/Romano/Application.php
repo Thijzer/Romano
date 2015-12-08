@@ -42,17 +42,16 @@ class Application
             $this->getModules($config['root'], $config['modules'])
         );
 
-        if (isset($config['theme']) && isset($config['head']['site'])) {
+        if (isset($config['head']['site'])) {
             $path['root_url'] = $config['head']['site'];
-            $path['theme_view'] = $path['app'].'Themes/'.$config['theme'].'/';
-            $path['theme_cache'] = $path['cache'].$config['theme'].'/';
-            $path['theme_name'] = $config['theme'];
+            $path['view'] = $path['app'].'Views/'.$config['view'].'/';
+            $path['view_cache'] = $path['cache'].$config['view'].'_view/';
         }
 
         Container::set('path', $path);
     }
 
-    public function buildURL($urlList)
+    private function buildURL($urlList)
     {
         $app = '/';
         $app .= ($this->defApp !== 'default') ? $this->defApp.'/' : '';
@@ -138,10 +137,20 @@ class Application
         Container::setParam(array('path', 'url', path('url') . $this->getLanguage() . '.php'));
         Container::setParam(array('path', 'lang', path('lang') . $this->getLanguage() . '.php'));
         Container::setParam(array('path', 'routes', path('url')));
+
+        // setup locale language
+        Lang::set(require path('lang'));
     }
 
     public function hasLanguage($language, $languages)
     {
         return (in_array($language, array_keys($languages)));
+    }
+
+    public function getRoutes()
+    {
+        $routes = require path('routes');
+        $this->buildURL($routes['routes']);
+        return $routes['routes'];
     }
 }
