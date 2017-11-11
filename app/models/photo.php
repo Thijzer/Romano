@@ -1,5 +1,5 @@
 <?php
-include_once (MODEL.'database.php');
+include_once (LIBS.'database.php');
 
 class Photo
 {
@@ -7,7 +7,7 @@ class Photo
 
 	function __construct()
 	{
-		$this->db	= new Database;
+		$this->db = new Database;
 	}
 
 	function getPictures($array=null)

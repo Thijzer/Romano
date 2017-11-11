@@ -1,5 +1,5 @@
 <?php
-include_once (MODEL.'database.php');
+include_once (LIBS.'database.php');
 
 class User
 {

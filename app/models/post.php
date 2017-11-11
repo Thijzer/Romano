@@ -1,15 +1,13 @@
 <?php
-include_once (MODEL.'database.php');
+include_once (LIBS.'database.php');
 class Post
 {
   public $db;
-  public function __construct()
-  {
+  public function __construct() {
     $this->db = new Database;
   }
 
-  function getPosts()
-  {
+  function getPosts() {
     return $this->db->query(
       "SELECT `posts`.`pid`,
       `posts`.`title`,
@@ -32,64 +30,39 @@ class Post
       ORDER BY `date` DESC LIMIT 10")->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  function getPost($pid)
-  {
-    if (is_numeric($pid))
-    {
+  function getPost($pid) {
+    if (is_numeric($pid)) {
       return $this->db->get('posts', array('pid' => $pid, 'active' => '1'))->fetch();
     }
   }
 
-  function getPid($title, $user)
-  {
-    if($this->db->get('posts', array('title' => str_replace('-', ' ', $title), 'user' => $user))->fetch())
-    {
+  function getPid($title, $user) {
+    if($this->db->get('posts', array('title' => str_replace('-', ' ', $title), 'user' => $user))->fetch()) {
       return $this;
     }
   }
 
-  function editPost($pid)
-  {
-    if(is_numeric($pid)) {
-      if ($_POST['tag']) {
-        $_POST['tag'] = $this->addTags($_POST['tag']);
-      }
-      if ($_POST) {
-        $this->db->edit('posts', $_POST);
-      }
-    } else {
-      return $this->getPost($pid);
+  function editPost($tags) {
+    if (isset($_POST['public'])) {
+      $public = '1';
     }
+    $this->db->edit('posts', array('title' => $_POST['title'], 'body' => $_POST['body'], 'tag' => $tags, 'public' => $public ));
   }
   // add a new blog entry
-  function addPost(){
-    $sesuser = $_SESSION['user']['username'];
-    $tags = $_POST['tags'];
-
-    if (isset($_POST['post'])) {
-      if (isset($_POST['public'])) {
-        $public = '1';
-      }
-      if (!empty($_POST['title']) AND !empty($_POST['body']) AND !empty($sesuser)){
-        if (!empty($_POST['tags'])) {$tags = $this->addTags($tags);}
-        $bind = $this->db->prepare("INSERT INTO `posts` (`user`, `title`, `body`, `tag`, `public`, `date`) VALUES (:user, :title, :body, :tags, :public, NOW())");
-        $bind->bindValue(':title', $_POST['title']);
-        $bind->bindValue(':user', $sesuser);
-        $bind->bindValue(':tags', $tags);
-        $bind->bindValue(':body', $_POST['body']);
-        $bind->bindValue(':public', $public);
-        $bind->execute();
-      }
+  function addPost($tags) {
+    if (isset($_POST['public'])) {
+      $public = '1';
     }
+    $this->db->add('posts', array('title' => $_POST['title'], 'uid' => $_SESSION['uid'], 'user' => $_SESSION['username'], 'body' => $_POST['body'], 'tag' => $tags, 'public' => $public ));
   }
-  function getTitles()
-  {
+  function getTitles() {
     return $this->db->query("SELECT `title`,`pid` FROM `posts` WHERE `active` = '1' ORDER BY `date` DESC LIMIT 5")->fetchAll();
   }
-  function getComments($pid)
-  {
-    if (is_numeric($pid))
-    {
+  function getId() {
+    return $this->db->lastInsertId();
+  }
+  function getComments($pid) {
+    if (is_numeric($pid)) {
       return $this->db->query("SELECT
       `body`,
       `user`,
@@ -98,8 +71,7 @@ class Post
       WHERE `pid` = '$pid'")->fetchAll();
     }
   }
-  function addComment($pid, $user, $body)
-  {
+  function addComment($pid, $user, $body) {
     if($this->db->add('comments', array('pid' => $pid, 'user' => $user, 'body' => $body)))
     {
       return true;

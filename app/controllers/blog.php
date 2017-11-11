@@ -1,5 +1,4 @@
 <?php
-
 class Blog extends Ctrlr
 {
 	private $view;

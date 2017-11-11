@@ -74,18 +74,47 @@ class Database extends PDO
     }
     return false;
   }
-  function edit($table,$array,$arg = array())
+  function multiAdd($table,$array,$arg = array())
+  {
+    $arg = array_merge($this->default,$arg);
+
+    if ($ar = $this->cleanup($array)) {
+      $q  = "INSERT INTO {$table} (";
+      $q  .= implode(', ', $ar['fields']);
+      $q  .= ') VALUES ';
+    }
+    if ($this->isArray($array) !== 'multi') {
+      $array = $this->toMultiArray($array);
+    }
+    for ($i=0; $i < count($array); $i++) { 
+      $q .= '(';
+      foreach ($array[$i] as $key => $value) {
+        $q .= $value.',';
+      }
+      $q .= ')';
+      if ($i+1 !== count($array)) {
+        $q .= ',';
+      }
+    }
+    $this->db->query($query);
+  }
+  function edit($table,$array,$where,$arg = array())
   {
     $arg = array_merge($this->default,$arg);
     if ($array = $this->cleanup($array)) {
-      $query  = 'UPDATE `'.$table.'` SET ';
-      $query .= implode(', ', $array['field']);
+      $query  = 'UPDATE {$table} SET ';
+      $query .= implode(', ', $array['reg']);
       $key    = current(array_keys($where));
-      $query .= " WHERE $key = $where[pid]";
+      $query .= " WHERE {$key} = {$where['pid']}";
       $this->execute($query);
     }
     return false;
   }
+  //function reset($table,$array, $arg = array())
+  //{
+  //  $this->edit($table,$array,$arg);
+  //  $this->add($table,$array,$arg);
+  //}
   private function cleanup($array) // cleans array, fills params
   {
     $this->params = null;
@@ -93,13 +122,14 @@ class Database extends PDO
       foreach ($array as $field => $value) {
         if ($value) {
           $conditions[] = ":$field";
+          $quest[]      = "?";
           $fields[]     = "`$field`";
           $like[]       = "`$field` LIKE CONCAT (:$field)";
           $reg[]        = "`$field` = :$field";
           $this->params[$field] = $value;
         }
       }
-      return array('conditions' => $conditions, 'like' => $like, 'fields' => $fields, 'reg' => $reg);
+      return array('quest' => $quest,'conditions' => $conditions, 'like' => $like, 'fields' => $fields, 'reg' => $reg);
     }
   }
   private function execute($query) // we need a params and the array for the values
@@ -123,6 +153,44 @@ class Database extends PDO
   {
     return $this->stmt->fetch(PDO::FETCH_ASSOC);
   }
-}
+  function isArray($array)
+  {
+    if(is_array($array[0])) {
+      return 'multi';
+    } elseif ((bool)count(array_filter(array_keys($array), 'is_string')) === true) {
+      return 'assoc';
+    } elseif(is_array($array)) {
+      return 'array';
+    } else {
+      return false;
+    }
+  }
+  function toMultiArray($array,$type = 1)
+  {
+    $new = array();
+    $cntkeys = count($array);
 
+    foreach ($array as $key => $value) {
+      $cntval = count($value); 
+      if ($cntval > 1 OR $cntval > $maxval) {
+        $maxval = $cntval;
+      }
+      $keyAr[] = $key;
+      if(!is_array($array[$key])){
+        $array[$key] = array();
+        for ($i=0; $i < $maxval; $i++) { 
+          $array[$key][$i] = $value;
+          for ($x=0; $x < $cntkeys; $x++) { 
+            $new[$i][$keyAr[$x]] = $array[$keyAr[$x]][$i];
+          }
+        }
+      }
+    }
+    if ($type === 1) {
+      return $new;
+    } else {
+      return $array; // different result
+    }
+  }
+}
 ?>
