@@ -1,0 +1,19 @@
+<?php
+function js_after(){
+?>
+
+<?php}
+function css_after(){
+?>
+
+<?php}
+function content($data){
+extract($data);
+?>
+
+<?php notice(); ?>
+
+
+<?php
+}
+?>

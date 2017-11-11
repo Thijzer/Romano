@@ -13,3 +13,18 @@ globals.php
 .Trashes
 Thumbs.db
 .DS_Store
+.DS_Store?
+._*
+ehthumbs.db
+
+#project files#
+###############
+config.php
+config.server.php
+pub/assets
+pub/files/resume.pdf
+pub/ico
+pub/img
+views/home/about.php
+views/home/contact.php
+
