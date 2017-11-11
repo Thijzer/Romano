@@ -2,66 +2,72 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c679963c-6003-4a99-ad5e-aab145c1b79e" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pub/favicon.ico" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pub/img/blank.gif" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pub/img/body.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pub/img/facebook.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pub/img/glyphicons-halflings-white.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pub/img/glyphicons-halflings.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pub/img/google.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pub/img/thijsdp.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pub/img/twitter.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/core.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/dev.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/libs/PHPMailerAutoload.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/libs/class.phpmailer.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/libs/class.pop3.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/libs/class.resize.img.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/libs/class.smtp.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/crud.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/database.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/photo.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/post.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/user.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/config.example.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/controllers/admin.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/controllers/api.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/controllers/blog.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/controllers/gallery.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/controllers/home.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/controllers/users.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pub/.htaccess" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pub/css/default.css" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pub/css/gallery_default.css" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pub/css/login.css" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pub/css/pygments-manni.css" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pub/index.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pub/js/html5shiv.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pub/js/respond.min.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/pub/robot.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/romano.sql" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/views/admin/add.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/views/api/default.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/views/blog/article.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/views/blog/index.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/views/gallery/album.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/views/gallery/create.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/views/gallery/edit.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/views/gallery/index.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/views/gallery/manage.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/views/gallery/picture.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/views/gallery/select.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/views/home/example.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/views/home/index.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/views/home/login.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/views/page.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/views/users/activate.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/views/users/login.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/views/users/lost.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/views/users/register.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/views/users/reset.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/libs/DB.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/libs/Validate.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/template/default/base.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/template/default/theme.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/config.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/dev.php" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/app/core.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/app/dev.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/app/libs/PHPMailerAutoload.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/app/libs/class.phpmailer.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/app/libs/class.pop3.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/app/libs/class.resize.img.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/app/libs/class.smtp.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/app/models/crud.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/app/models/database.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/app/models/photo.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/app/models/post.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/app/models/user.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/config.example.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/controllers/admin.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/controllers/api.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/controllers/blog.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/controllers/gallery.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/controllers/home.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/controllers/users.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/pub/css/default.css" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/pub/css/gallery_default.css" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/pub/css/login.css" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/pub/css/pygments-manni.css" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/pub/favicon.ico" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/pub/img/blank.gif" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/pub/img/body.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/pub/img/facebook.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/pub/img/glyphicons-halflings-white.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/pub/img/glyphicons-halflings.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/pub/img/google.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/pub/img/thijsdp.jpg" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/pub/img/twitter.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/pub/js/html5shiv.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/pub/js/respond.min.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/pub/robot.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/romano.sql" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/views/admin/add.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/views/api/default.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/views/blog/article.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/views/blog/index.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/views/gallery/album.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/views/gallery/create.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/views/gallery/edit.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/views/gallery/index.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/views/gallery/manage.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/views/gallery/picture.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/views/gallery/select.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/views/home/index.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/views/home/login.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/views/page.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/views/users/activate.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/views/users/login.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/views/users/lost.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/views/users/register.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/views/users/reset.php" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/views/home/example.txt" afterPath="$PROJECT_DIR$/app/views/home/example.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pub/index.php" afterPath="$PROJECT_DIR$/pub/index.php" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -72,22 +78,22 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="540">
-              <caret line="30" column="0" lean-forward="true" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
+              <caret line="30" column="0" lean-forward="false" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
+      <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="-141">
-                <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <first_editor relative-caret-position="864">
+                <caret line="48" column="29" lean-forward="false" selection-start-line="48" selection-start-column="29" selection-end-line="48" selection-end-column="29" />
                 <folding />
               </first_editor>
               <second_editor />
@@ -103,8 +109,8 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -141,11 +147,6 @@
             <path>
               <item name="Romano" type="b2602c69:ProjectViewProjectNode" />
               <item name="Romano" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="Romano" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Romano" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="controllers" type="2a2b976b:PhpTreeStructureProvider$1" />
             </path>
           </expand>
           <select />
@@ -186,7 +187,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="138000" />
+    <option name="totallyTimeSpent" value="223000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1744" height="1392" extended-state="4" />
@@ -233,11 +234,30 @@
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="-141">
-            <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <first_editor relative-caret-position="1065">
+            <caret line="67" column="0" lean-forward="true" selection-start-line="67" selection-start-column="0" selection-end-line="67" selection-end-column="0" />
             <folding />
           </first_editor>
           <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="864">
+            <caret line="48" column="29" lean-forward="false" selection-start-line="48" selection-start-column="29" selection-end-line="48" selection-end-column="29" />
+            <folding />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="540">
+          <caret line="30" column="0" lean-forward="false" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
