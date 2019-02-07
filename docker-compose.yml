@@ -1,0 +1,15 @@
+version: '2'
+services:
+  web:
+    image: webdevops/php-apache-dev
+    links:
+      - db
+    ports:
+      - 80:80
+    volumes:
+      - ./CODE/:/app
+ 
+  db:
+    image: mysql
+    volumes:
+      - ./.data/mysql:/var/lib/mysql
