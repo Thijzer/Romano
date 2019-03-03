@@ -1,17 +1,23 @@
 <?php
 
-require '../bootstrap.php';
+require __DIR__.'/../vendor/autoload.php';
+require __DIR__.'/../app/config.php';
 
-// start Request
-$request = new Request($_SERVER, $_REQUEST);
+use \Romano\Framework\Request;
+use \Romano\Framework\Application;
+use \Romano\Framework\Route;
 
-// start Application Environment
-$application = new Application();
-$application->setRootConfiguration(dirname(__DIR__), 'settings/globals.php');
+
+$request = new Request();
+$application = new Application(dirname(__DIR__), $configuration);
 $application->buildEnvironmentFromRequest($request);
 
 // start Routes
 $route = new Route($request);
+
+
+exit;
+
 if (($route->search($application->getRoutes())) && ($result = $route->getResource())) {
     $view = $request->get('VIEW');
     //$track = Track::get()->fromClient();

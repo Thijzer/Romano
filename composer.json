@@ -12,15 +12,16 @@
         }
     ],
     "require": {
-        "twig/twig": "1.*",
-        "php": ">=5.3.3"
+        "php": ">=7.3",
+        "twig/twig": "^2.6"
     },
     "autoload": {
         "psr-4": {
-            "Romano\\": "src/Romano/",
-            "App\\": "app/",
-            "modules\\": "modules/",
-            "scr\\": "scr/"
+            "Romano\\": "src/"
         }
+    },
+    "require-dev": {
+        "phpspec/phpspec": "^5.1",
+        "phpunit/phpunit": "^8.0"
     }
 }

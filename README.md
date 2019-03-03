@@ -33,7 +33,7 @@ it still needs a lot more global functionality before it would serve any useful 
 
 Experimental version
 --------------------
-The framework is not ment to be ready for public use as of today,
+The framework is not meant to be ready for public use as of today,
 but serves more as a minor display of the Romano framework, a proof of concept.
 The site blog example
 
