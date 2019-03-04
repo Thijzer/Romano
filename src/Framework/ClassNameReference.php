@@ -25,11 +25,11 @@ class ClassNameReference
     }
 
     /**
-     * @param $object
+     * @param object $object
      *
      * @return bool
      */
-    public function equals($object): bool
+    public function equals(object $object): bool
     {
         return $this->is((new self($object))->getClassName());
     }

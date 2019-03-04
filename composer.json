@@ -23,5 +23,8 @@
     "require-dev": {
         "phpspec/phpspec": "^5.1",
         "phpunit/phpunit": "^8.0"
+    },
+    "config": {
+      "bin-dir": "bin"
     }
 }
