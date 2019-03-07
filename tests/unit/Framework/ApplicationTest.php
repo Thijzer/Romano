@@ -20,18 +20,18 @@ class ApplicationTest extends TestCase
     /**
      * @test
      */
-    public function it_should_build_the_path_array()
+    public function it_should_build_the_path_array(): void
     {
         $data = [
             'app_name' => 'blog',
         ];
 
-        $result = new Application(dirname(__DIR__), $data);
+        $result = new Application(\dirname(__DIR__, 3), $data);
 
         $result->buildProject();
 
         $expected = [
-            'root' => '/home/thijzer/Sync/Projects/Romano/tests/',
+            'root' => '/home/thijzer/Sync/Projects/Romano/',
             'app' => 'app/blog/',
             'src'=> 'src/',
             'app_config' => 'app/blog/config/',

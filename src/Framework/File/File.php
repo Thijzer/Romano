@@ -1,6 +1,8 @@
 <?php
 
-class File extends SPLFileInfo
+namespace Romano\Framework\File;
+
+class File extends \SPLFileInfo
 {
     private $fullPath;
     private $content;
@@ -14,7 +16,7 @@ class File extends SPLFileInfo
     {
         parent::__construct($fullPath);
 
-        if (is_array($properties)) {
+        if (\is_array($properties)) {
             foreach ($properties as $key => $value) {
                 $this->{$key} = $value;
             }
@@ -36,7 +38,7 @@ class File extends SPLFileInfo
 
     public function getFullPathHash()
     {
-        return crc32b($this->fullPath);
+        return \crc32($this->fullPath);
     }
 
     public function getContent()
@@ -50,14 +52,14 @@ class File extends SPLFileInfo
         return $this;
     }
 
-    public function getHash()
+    public function getHash(): FileHash
     {
-        return crc32b($this->getContent());
+        return FileHash::generate($this->getContent());
     }
 
     public function getMimeType()
     {
-        if (!$this->mimetype && $this->exsists()) {
+        if (!$this->mimetype && $this->exists()) {
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             $this->mimetype = finfo_file($finfo, $this->fullPath);
             finfo_close($finfo);
@@ -108,7 +110,7 @@ class File extends SPLFileInfo
                 $localFile = fopen($this->fullPath, 'w+');
                 fwrite($localFile, $this->getContent());
                 fclose($localFile);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 die($e);
             }
         }

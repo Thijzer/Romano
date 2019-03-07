@@ -12,11 +12,13 @@ class Lang
         if (!isset(self::$array[$type][$slug])) {
             return '!!! missing locale !!! : '.$route;
         }
-        $respons = self::$array[$type][$slug];
+
+        $response = self::$array[$type][$slug];
         if (!empty($replacers)) {
-            return str_replace(array_flip($replacers), $replacers, $respons);
+            return str_replace(array_flip($replacers), $replacers, $response);
         }
-        return $respons;
+
+        return $response;
     }
 
     public static function set(array $locale)

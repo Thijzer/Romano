@@ -22,12 +22,22 @@ class Request
         return $this->parameters->get($key);
     }
 
+    public function has(string $key): bool
+    {
+        return $this->parameters->has($key);
+    }
+
     public function set(string $key, $value): void
     {
         $this->parameters->add($key, $value);
     }
 
-    public function getURLSection(string $section)
+    public function getURLSections(): array
+    {
+        return $this->parameters->get('SECTIONS');
+    }
+
+    public function getURLSection(int $section)
     {
         return $this->parameters->get('SECTIONS', $section);
     }

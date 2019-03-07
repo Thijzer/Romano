@@ -81,36 +81,18 @@ class Application
         //$this->setLanguage();
     }
 
-    private function buildURL($urlList)
+    public function buildRouter(): router
     {
-        $app = '/';
-        $app .= ($this->defApp !== 'default') ? $this->defApp.'/' : '';
-        $app .= ($this->currentLanguage) ? $this->currentLanguage.'/' : '';
+        return RouteFactory::buildRouter($this->getProvisionedConfig());
+    }
 
-        $tmp = [];
-        foreach ($urlList as $key => $route) {
-            if (isset($route['params'])) {
-                preg_match_all('~{(.*?)}~', $key, $output);
-                $glu = implode('_', $output[1]);
-                $tmp[$route['resource']]['dynamic'][$glu] = $app.$key;
-                continue;
-            }
-
-            $tmp[$route['resource']]['static'][] = $app.$key;
-        }
-
-        $this->config->setParameter('url', $tmp);
+    public function getProvisionedConfig(): ConfigurationManager
+    {
+        return $this->config;
     }
 
     public function getConfig(): ConfigurationManager
     {
         return $this->config;
-    }
-
-    public function getRoutes()
-    {
-        $routes = require path('routes');
-        $this->buildURL($routes['routes']);
-        return $routes['routes'];
     }
 }
