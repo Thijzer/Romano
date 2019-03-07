@@ -1,6 +1,6 @@
 <?php
 
-namespace Framework;
+namespace Romano\Framework;
 
 abstract class Controller
 {

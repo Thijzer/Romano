@@ -1,25 +1,25 @@
 <?php
 
-
+namespace Romano\Framework;
 
 class Cookie
 {
-    static function set($name, $data, $expiry)
+    public static function set(string $name, $data, int $expiry): void
     {
-        return setcookie($name, json_encode($data), $expiry);
+        setcookie($name, \is_array($data) ? json_encode($data) : $data, $expiry);
     }
 
-    static function get($name)
+    public static function get(string $name): array
     {
-        if (self::exists($name)) return (array) json_decode($_COOKIE[$name]);
+        return (array) json_decode($_COOKIE[$name] ?? '');
     }
 
-    static function exists($name)
+    public static function exists(string $name): bool
     {
         return isset($_COOKIE[$name]);
     }
 
-    static function delete($name)
+    public static function delete($name): void
     {
         self::set($name, '', time() - 1);
         unset($_COOKIE[$name]);
