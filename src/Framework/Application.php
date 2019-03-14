@@ -2,6 +2,10 @@
 
 namespace Romano\Framework;
 
+use Romano\Component\Common\Matroska;
+use Romano\Framework\Router\RouteFactory;
+use Romano\Framework\Router\Router;
+
 class Application
 {
     private $request;
@@ -23,7 +27,7 @@ class Application
         $path['app'] = 'app/'.$config['app_name'].'/';
         $path['src'] = 'src/';
         $path['app_config'] = $path['app'].'config/';
-        $path['lang'] = $path['app_config'].'Language/';
+        $path['Romano\Component\Common\Locale\Lang'] = $path['app_config'].'Language/';
         $path['url'] = $path['app_config'].'Url/';
         $path['resource'] = $path['src'].'Resources/';
         $path['cache'] = $path['src'].'Cache/';

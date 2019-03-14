@@ -1,6 +1,9 @@
 <?php
 
-namespace Romano\Framework;
+namespace Romano\Framework\HTTP;
+
+use Romano\Component\Common\ContainerInterface;
+use Romano\Component\Common\Matroska;
 
 class Request
 {

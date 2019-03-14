@@ -1,8 +1,9 @@
 <?php
 
-namespace Romano\Framework;
+namespace Romano\Component\Common;
 
-use Romano\Framework\ArrayFunctions as ArrayFunc;
+use Romano\Component\Common\ContainerInterface;
+use Romano\Framework\Functions\ArrayFunctions as ArrayFunc;
 
 class Matroska implements ContainerInterface
 {

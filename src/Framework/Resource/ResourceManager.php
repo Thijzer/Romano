@@ -3,7 +3,7 @@
 namespace Romano\Framework\Resource;
 
 use Romano\Framework\File\File;
-use Romano\Framework\TemplateBuilder;
+use Romano\Framework\Template\TemplateBuilder;
 
 class ResourceManager
 {

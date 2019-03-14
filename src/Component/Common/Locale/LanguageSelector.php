@@ -1,6 +1,9 @@
 <?php
 
-namespace Romano\Framework;
+namespace Romano\Component\Common\Locale;
+
+use Romano\Framework\Container;
+use Romano\Framework\Lang;
 
 class LanguageSelector
 {
@@ -31,11 +34,11 @@ class LanguageSelector
     public function setLanguage()
     {
         Container::setParam(array('path', 'url', path('url') . $this->getLanguage() . '.php'));
-        Container::setParam(array('path', 'lang', path('lang') . $this->getLanguage() . '.php'));
+        Container::setParam(array('path', 'Romano\Component\Common\Locale\Lang', path('Romano\Component\Common\Locale\Lang') . $this->getLanguage() . '.php'));
         Container::setParam(array('path', 'routes', path('url')));
 
         // setup locale language
-        Lang::set(require path('lang'));
+        Lang::set(require path('Romano\Component\Common\Locale\Lang'));
     }
 
     public function hasLanguage($language, $languages)

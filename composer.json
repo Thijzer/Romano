@@ -13,6 +13,9 @@
     ],
     "require": {
         "php": ">=7.2.0",
+        "ext-json": "*",
+        "ext-fileinfo": "*",
+        "ext-gd": "*",
         "twig/twig": "^2.6"
     },
     "autoload": {

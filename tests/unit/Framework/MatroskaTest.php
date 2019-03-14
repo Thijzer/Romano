@@ -12,7 +12,7 @@
 namespace Tests\Romano\Framework\Utils;
 
 use PHPUnit\Framework\TestCase;
-use Romano\Framework\Matroska;
+use Romano\Component\Common\Matroska;
 
 class MatroskaTest extends TestCase
 {

@@ -3,7 +3,7 @@
 require __DIR__.'/../vendor/autoload.php';
 require __DIR__.'/../app/config.php';
 
-use \Romano\Framework\Request;
+use \Romano\Framework\HTTP\Request;
 use \Romano\Framework\Application;
 
 $request = new Request();

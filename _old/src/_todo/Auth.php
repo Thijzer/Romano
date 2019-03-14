@@ -15,6 +15,8 @@
 */
 
 
+use Framework\Infrastructure\Query;
+use Romano\Infrastructure\DB;
 
 class Auth
 {

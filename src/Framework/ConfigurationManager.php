@@ -2,6 +2,8 @@
 
 namespace Romano\Framework;
 
+use Romano\Component\Common\ContainerInterface;
+
 class ConfigurationManager
 {
     private $configuration;

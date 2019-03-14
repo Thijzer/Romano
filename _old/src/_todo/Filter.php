@@ -1,13 +1,5 @@
 <?php
 
-/**
-* Filter library
-* -------------
-* creator/source : Thijs De Paepe
-*/
-
-
-
 Class Filter
 {
 

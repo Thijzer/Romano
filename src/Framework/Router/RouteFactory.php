@@ -1,6 +1,8 @@
 <?php
 
-namespace Romano\Framework;
+namespace Romano\Framework\Router;
+
+use Romano\Framework\ConfigurationManager;
 
 class RouteFactory
 {

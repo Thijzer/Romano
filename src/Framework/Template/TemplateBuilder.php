@@ -1,6 +1,6 @@
 <?php
 
-namespace Romano\Framework;
+namespace Romano\Framework\Template;
 
 use Romano\Framework\Exception\UnknownTemplateEngineException;
 

@@ -1,15 +1,17 @@
 <?php
 
+namespace Framework\Infrastructure;
+
 class Query
 {
     /**
-    * @var bool
-    */
+     * @var bool
+     */
     protected $where = false;
 
     /**
-    * @var string
-    */
+     * @var string
+     */
     protected $table = null;
     protected $startQuery = null;
     protected $query = null;
@@ -17,8 +19,8 @@ class Query
     protected $parameter = null;
 
     /**
-    * @var array
-    */
+     * @var array
+     */
     protected $settings = array('namedParams' => true);
     protected $params = array();
     protected $paramKeys = array();
@@ -31,8 +33,8 @@ class Query
     );
 
     /**
-    * assembles the queries.
-    */
+     * assembles the queries.
+     */
     private function assembleQuery($array, $arg)
     {
         $array = array_filter((array)$array);
@@ -58,11 +60,11 @@ class Query
                         $query .= '' . $key . '' . $arg['operator'];
 
                         // optional key selection
-                        if($arg['type'] ==  'params') {
+                        if ($arg['type'] == 'params') {
                             $param = ':' . $key;
                             $this->params[$param] = $value;
 
-                        } elseif($arg['type'] == '?') {
+                        } elseif ($arg['type'] == '?') {
 
                             $this->params[] = $value;
                             $param = '?';
@@ -70,8 +72,7 @@ class Query
 
                         if ($arg['operator'] == ' LIKE ') {
                             $query .= "CONCAT('%', " . $param . ", '%')";
-                        }
-                        else $query .= $param;
+                        } else $query .= $param;
 
                         // new line
                         $query .= "\n";
@@ -113,11 +114,11 @@ class Query
     {
         $arg = array_merge($this->arguments, $arg);
         if ($this->where === true) {
-            $this->query .= ' ' . $arg['split'] . ' ' . (string) $whereValue;
+            $this->query .= ' ' . $arg['split'] . ' ' . (string)$whereValue;
             return;
         }
         $this->where = true;
-        $this->query .= ' WHERE ' . (string) $whereValue;
+        $this->query .= ' WHERE ' . (string)$whereValue;
     }
 
     public function where(array $where, $arg = array())
@@ -132,7 +133,7 @@ class Query
 
     static public function table($table, $nick = null)
     {
-        if ((string) $table) {
+        if ((string)$table) {
             $instance = new Query();
             $instance->table = $table;
             $instance->startQuery('SELECT * FROM ' . $table);
@@ -174,9 +175,9 @@ class Query
 
     public function insert($fields = array(), $arg = array())
     {
-        $this->assembleQuery((array) $fields, $arg = array_merge($this->arguments, $arg));
+        $this->assembleQuery((array)$fields, $arg = array_merge($this->arguments, $arg));
 
-        $placeholder = ($this->settings['namedParams'] ===  false) ? array_fill(0, count($this->paramKeys), '?') : array_keys($this->params);
+        $placeholder = ($this->settings['namedParams'] === false) ? array_fill(0, count($this->paramKeys), '?') : array_keys($this->params);
 
         $this->startQuery('INSERT INTO ' . $this->table .
             $this->sqlImplode($this->paramKeys, '`', '`') . 'VALUES' .
@@ -187,7 +188,9 @@ class Query
 
     public function sqlImplode(array $arr, $in = '', $out = '', $segment = ', ')
     {
-        array_walk($arr, function(&$x) use ($in, $out){ $x = $in . $x . $out; });
+        array_walk($arr, function (&$x) use ($in, $out) {
+            $x = $in . $x . $out;
+        });
         return ' (' . implode($segment, $arr) . ') ';
     }
 
@@ -201,7 +204,7 @@ class Query
     public function build()
     {
         return array(
-            'query' => $this->startQuery . $this->query . $this->endQuery,
+            'Framework\Infrastructure\Query' => $this->startQuery . $this->query . $this->endQuery,
             'params' => $this->params
         );
     }
@@ -217,7 +220,7 @@ class Query
     {
         $query = $this->assembleQuery($fields, $arg = array_merge($this->arguments, array('type' => 'noParams')));
         $this->startQuery('INSERT INTO ' . $this->table . ' ' . $query);
-        if(in_array($id, array_flip($fields))) unset($fields[$id]); else exit('query::save no id in fields');
+        if (in_array($id, array_flip($fields))) unset($fields[$id]); else exit('query::save no id in fields');
 
         $q = "\n";
         foreach ($fields as $key => $value) {

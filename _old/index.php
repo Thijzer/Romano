@@ -1,4 +1,7 @@
 <?php
+
+use Romano\Infrastructure\DB;
+
 define('TIME', microtime(true));
 session_start();
 require('../config.php');

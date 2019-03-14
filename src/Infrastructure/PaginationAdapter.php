@@ -1,6 +1,9 @@
 <?php
 
-namespace Romano\Framework;
+namespace Romano\Infrastructure;
+
+use Romano\Framework\Lang;
+use Romano\Framework\Output;
 
 class PaginationAdapter
 {

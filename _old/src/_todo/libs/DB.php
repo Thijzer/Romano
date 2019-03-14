@@ -25,14 +25,14 @@ class DB //extends PDO
 
     public static function getInstance()
     {
-        if (!isset(self::$_instance)) {
-            self::$_instance = new PDO(
+        if (!isset(\Romano\Infrastructure\self::$_instance)) {
+            \Romano\Infrastructure\self::$_instance = new PDO(
               $dsn = ConfigurationManager::$array['DB']['DSN'],
               $username = ConfigurationManager::$array['DB']['USER'],
               $password = ConfigurationManager::$array['DB']['PASS']
             );
 
-            return self::$_instance;
+            return \Romano\Infrastructure\self::$_instance;
         }
     }
 
@@ -52,7 +52,7 @@ class DB //extends PDO
     public function get($table, $where, $arg = [])
     {
         $action = $this->action($table, $where, $arg = $this->arguments($arg + ['split' => ' AND ']));
-        $sql = "SELECT {$arg['field']} FROM {$table} WHERE {$action['query']}";
+        $sql = "SELECT {$arg['field']} FROM {$table} WHERE {$action['Framework\Infrastructure\Query']}";
         if (!$this->exec($sql, $action['values'])) {
             return $this;
         }
@@ -61,7 +61,7 @@ class DB //extends PDO
     public function delete($table, $where, $arg = [])
     {
         $action = $this->action($table, $where, $arg = $this->arguments($arg + ['split' => ' AND ']));
-        $sql = "DELETE {$arg['field']} FROM {$table} WHERE {$action['query']}";
+        $sql = "DELETE {$arg['field']} FROM {$table} WHERE {$action['Framework\Infrastructure\Query']}";
         if (!$this->exec($sql, $action['values'])) {
             return $this;
         }
@@ -79,7 +79,7 @@ class DB //extends PDO
     public function update($table, $fields, $id, $arg = [])
     {
         $action = $this->action($table, $fields, $arg = $this->arguments($arg + ['split' => '`, `']));
-        $sql = "UPDATE {$table} SET {$action['query']} WHERE `uid` = {$id}";
+        $sql = "UPDATE {$table} SET {$action['Framework\Infrastructure\Query']} WHERE `uid` = {$id}";
         if ($this->exec($sql, $action['values'])) {
             return true;
         }
@@ -127,7 +127,7 @@ class DB //extends PDO
                 $values[$key] = $value;
             }
 
-            return ['query' => $query, 'values' => $values];
+            return ['Framework\Infrastructure\Query' => $query, 'values' => $values];
         }
 
         return false;

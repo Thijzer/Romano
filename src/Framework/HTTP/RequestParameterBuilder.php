@@ -1,10 +1,13 @@
 <?php
 
-namespace Framework;
+namespace Romano\Framework\HTTP;
+
+use Romano\Component\Common\ContainerInterface;
+use Romano\Component\Common\Matroska;
 
 class RequestParameterBuilder
 {
-    private static function buildParameters(array $server, array $resquest): ContainerInterface
+    public static function buildParameters(array $server, array $resquest): ContainerInterface
     {
         $parameters = array_merge($server, $resquest);
         $parameters['URI'] = trim(str_replace('?'.$server['QUERY_STRING'], '', $server['REQUEST_URI']), '/');

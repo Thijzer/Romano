@@ -13,7 +13,7 @@ namespace Tests\Romano\Framework\Utils;
 
 use PHPUnit\Framework\TestCase;
 use Romano\Framework\Application;
-use Romano\Framework\Matroska;
+use Romano\Component\Common\Matroska;
 
 class ApplicationTest extends TestCase
 {
@@ -35,7 +35,7 @@ class ApplicationTest extends TestCase
             'app' => 'app/blog/',
             'src'=> 'src/',
             'app_config' => 'app/blog/config/',
-            'lang' => 'app/blog/config/Language/',
+            'Romano\Component\Common\Locale\Lang' => 'app/blog/config/Language/',
             'url' => 'app/blog/config/Url/',
             'resource' => 'src/Resources/',
             'cache' => 'src/Cache/',

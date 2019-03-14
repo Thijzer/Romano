@@ -1,46 +1,10 @@
 <?php
 
-namespace Romano\Framework;
+namespace Romano\Framework\Functions;
 
 class ArrayFunctions
 {
     public const delimiter = '.';
-
-    private static $array;
-
-    private static $foreignChars =  array(
-        'from' => array ('ç','æ','œ','á','é','í','ó','ú','à','è','ì','ò','ù','ä','ë','ï','ö','ü','ÿ','â','ê','î','ô','û','å','e','i','ø','u'),
-        'to' => array ('c','ae','oe','a','e','i','o','u','a','e','i','o','u','a','e','i','o','u','y','a','e','i','o','u','a','e','i','o','u')
-    );
-
-    private static function getChars()
-    {
-        return array(
-            'specials' => array ("'",'’'),
-            'markUp' => array ('(',')','[',']','"','«','»',':','.','?','!',',',';','{','}','`'),
-            'html' => array ('<','>','/'),
-            'extras' => array ('~','@','$','%','^','&','|','+','='),
-            'markDown' => array ('#','-','*'),
-            'alfabet' => range('a', 'z'),
-            'alfabetCap' => range('A', 'Z'),
-            'numbers' => range(0, 9)
-        );
-    }
-
-    /**
-     * return a glued array from arrays with a mutual key
-    */
-    static public function mergeOnKey($key, $array1, $array2)
-    {
-        $r = array();
-        // foreach(array_slice(func_get_args(), 1) as &$a) {
-        //     if(array_key_exists($key, $a)) {
-        //         $r[] = $a[$key];
-        //         continue;
-        //     }
-        // }
-        return $r;
-    }
 
     public static function indexBy($newIndex, array $files)
     {
@@ -77,15 +41,25 @@ class ArrayFunctions
         return ($key === self::getLastKey($rr));
     }
 
-    public static function getLastKey($rr)
+    /**
+     * @param array $array
+     *
+     * @return mixed
+     */
+    public static function getLastKey(array $array)
     {
-        end($rr);
-        return key($rr);
+        end($array);
+        return key($array);
     }
 
-    public static function getLastValue($rr)
+    /**
+     * @param array $array
+     *
+     * @return mixed
+     */
+    public static function getLastValue(array $array)
     {
-        return $rr[self::getLastKey($rr)];
+        return $array[self::getLastKey($array)];
     }
 
     /**
@@ -101,7 +75,7 @@ class ArrayFunctions
      *
      * @return array
      */
-    public static function unflatten(array $array, $prefix = '.')
+    public static function unflatten(array $array, string $prefix = '.')
     {
         $output = [];
         foreach ($array as $key => $value) {
@@ -114,7 +88,7 @@ class ArrayFunctions
         return $output;
     }
 
-    public static function arraySet(&$array, string $keys, $value): array
+    public static function arraySet(array &$array, string $keys, $value): array
     {
         $keys = \explode(self::delimiter, $keys);
         while (\count($keys) > 1) {

@@ -1,13 +1,6 @@
 <?php
 
-/*
-*  Resize wrapper for GD
-*  original source : http://www.phproots.com/resizing-images-with-php/
-*
-*  added by Thijzer methods : icon, crop, store, getPath, getArray
-*/
-
-
+namespace Romano\Framework\File\Image;
 
 class ResizeImage
 {

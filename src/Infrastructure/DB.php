@@ -1,10 +1,15 @@
 <?php
 
+namespace Romano\Infrastructure;
+
+use Output;
+use Singleton;
+
 class DB extends \PDO
 {
     /**
-    * @var array
-    */
+     * @var array
+     */
     protected $stmt, $query, $params, $results;
     protected $options = array(\PDO::ATTR_EMULATE_PREPARES, false);
     protected $fetchMode = \PDO::FETCH_ASSOC;
@@ -12,13 +17,13 @@ class DB extends \PDO
     public function __construct($DB = array())
     {
         try {
-            $DB = array_merge(config('DB'), $DB);
+            $DB = array_merge(config('Romano\Infrastructure\DB'), $DB);
             parent::__construct($DB['DSN'], $DB['USER'], $DB['PASS'], $this->options);
         } catch (\PDOException $e) {
             if (DEV_ENV === true) {
                 throw dump($e->getMessage());
             }
-            throw Output::page('500','CONNECTION ERROR');
+            throw Output::page('500', 'CONNECTION ERROR');
         }
     }
 
@@ -37,8 +42,8 @@ class DB extends \PDO
     public static function run(array $process)
     {
         $instance = Singleton::getInstance(get_class());
-        $instance->query = (string) $process['query'];
-        $instance->params = (isset($process['params'])?$process['params']:[]);
+        $instance->query = (string)$process['Framework\Infrastructure\Query'];
+        $instance->params = (isset($process['params']) ? $process['params'] : []);
         $instance->stmt = null;
         $instance->results[] = $process;
         $instance->processParams();
@@ -63,7 +68,7 @@ class DB extends \PDO
     public function get($value)
     {
         $temp = $this->stmt->fetch($this->fetchMode);
-        return (isset($temp[$value])) ? $temp[$value] : dump($value.' is not set');
+        return (isset($temp[$value])) ? $temp[$value] : dump($value . ' is not set');
     }
 
     public function getId($id = 'id')

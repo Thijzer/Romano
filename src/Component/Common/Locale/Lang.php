@@ -1,6 +1,6 @@
 <?php
 
-
+namespace Romano\Component\Common\Locale;
 
 class Lang
 {
@@ -10,7 +10,7 @@ class Lang
     {
         list($type, $slug) = explode('.', $route, 2);
         if (!isset(self::$array[$type][$slug])) {
-            return '!!! missing locale !!! : '.$route;
+            return '!!! missing locale !!! : ' . $route;
         }
 
         $response = self::$array[$type][$slug];
@@ -24,7 +24,7 @@ class Lang
     public static function set(array $locale)
     {
         if (!self::$array) {
-             self::$array = $locale;
+            self::$array = $locale;
         }
     }
 }

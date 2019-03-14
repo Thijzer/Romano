@@ -11,13 +11,18 @@
   * dependencies : needs DB layer/wrapper for "checkDB"
   */
 
-  
+
+namespace Romano\Framework\Form;
+
+use Romano\Infrastructure\DB;
+use Framework\Infrastructure\Query;
+use Romano\Component\Common\Locale\Lang;
 
 class Validate
 {
     private $gate;
     private $errors = array();
-    private $source =  array();
+    private $source = array();
     private $data = array();
 
     function __construct($data)
@@ -25,7 +30,7 @@ class Validate
         $this->source = $data;
     }
 
-    public function check($item ,$rules = array() )
+    public function check($item, $rules = array())
     {
         $this->data[$item] = '';
         $this->gate = true;
@@ -34,8 +39,8 @@ class Validate
             if ($this->gate === true) {
                 switch ($rule) {
                     case 'required':
-                        if (empty($value) AND $rule_value === true ) {
-                            $this->addError($item ,Lang::get('error.valid.required', array('{{item}}' => $item)));
+                        if (empty($value) AND $rule_value === true) {
+                            $this->addError($item, Lang::get('error.valid.required', array('{{item}}' => $item)));
                         }
                         break;
                     case 'min':
@@ -54,11 +59,11 @@ class Validate
                         }
                         break;
                     case 'regex':
-                        if (!preg_match($rule_value, $value) ) {
+                        if (!preg_match($rule_value, $value)) {
                             $this->addError($item, Lang::get('error.valid.nomatch', array('{{item}}' => $item)));
                         }
                         break;
-                    case 'db':
+                    case 'Romano\Infrastructure\DB':
                         if (is_array($rule_value)) $this->checkDB($rule_value, strtolower($item), strtolower($value));
                         break;
                     default:
@@ -82,7 +87,7 @@ class Validate
     {
         $result = DB::run(
             Query::table($array['table'])
-            ->where(array($where_key => $where_val))->build()
+                ->where(array($where_key => $where_val))->build()
         )->fetch();
 
         if ($result) {
@@ -96,8 +101,7 @@ class Validate
                     case 'active':
                         if ($result['active'] === 1 AND $value === false) {
                             $this->addError($where_key, Lang::get('error.valid.db.active', array('{{item}}' => $where_key)));
-                        }
-                        elseif (empty($result['active']) AND $value === true) {
+                        } elseif (empty($result['active']) AND $value === true) {
                             $this->addError($where_key, Lang::get('error.valid.db.notactive', array('{{item}}' => $where_key)));
                         }
                         break;

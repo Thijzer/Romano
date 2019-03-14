@@ -1,6 +1,10 @@
 <?php
 
-namespace Romano\Framework;
+namespace Romano\Framework\Router;
+
+use Romano\Framework\Request;
+use Romano\Framework\Router\Route;
+use Romano\Framework\Template\TemplateBuilder;
 
 class Router
 {

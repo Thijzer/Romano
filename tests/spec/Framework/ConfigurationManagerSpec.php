@@ -4,7 +4,7 @@ namespace spec\Romano\Framework;
 
 use Romano\Framework\ConfigurationManager;
 use PhpSpec\ObjectBehavior;
-use Romano\Framework\ContainerInterface;
+use Romano\Component\Common\ContainerInterface;
 
 class ConfigurationManagerSpec extends ObjectBehavior
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Romano\Framework;
+namespace Romano\Component\Common;
 
 class ClassNameReference
 {
