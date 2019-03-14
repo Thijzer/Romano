@@ -1,0 +1,130 @@
+<?php
+/*
+  * Validation library 11/2013
+  * --------------------------
+  * creator/source : Alex Garrett
+  * - added regex
+  * - decoupled
+  * - CheckDB method
+  * - gate system for less validations
+  *
+  * dependencies : needs DB layer/wrapper for "checkDB"
+  */
+
+
+namespace Romano\Framework\Form;
+
+use Romano\Infrastructure\DB;
+use Framework\Infrastructure\Query;
+use Romano\Component\Common\Locale\Lang;
+
+class Validate
+{
+    private $gate;
+    private $errors = array();
+    private $source = array();
+    private $data = array();
+
+    function __construct($data)
+    {
+        $this->source = $data;
+    }
+
+    public function check($item, $rules = array())
+    {
+        $this->data[$item] = '';
+        $this->gate = true;
+        foreach ($rules as $rule => $rule_value) {
+            $value = trim($this->source[$item]);
+            if ($this->gate === true) {
+                switch ($rule) {
+                    case 'required':
+                        if (empty($value) AND $rule_value === true) {
+                            $this->addError($item, Lang::get('error.valid.required', array('{{item}}' => $item)));
+                        }
+                        break;
+                    case 'min':
+                        if (strlen($value) < $rule_value) {
+                            $this->addError($item, Lang::get('error.valid.minchar', array('{{item}}' => $item, '{{rule_value}}' => $rule_value)));
+                        }
+                        break;
+                    case 'max':
+                        if (strlen($value) > $rule_value) {
+                            $this->addError($item, Lang::get('error.valid.maxchar', array('{{item}}' => $item, '{{rule_value}}' => $rule_value)));
+                        }
+                        break;
+                    case 'matches':
+                        if (empty($value) || $value !== trim($this->source[$rule_value])) {
+                            $this->addError($item, Lang::get('error.valid.nomatch', array('{{item}}' => $item)));
+                        }
+                        break;
+                    case 'regex':
+                        if (!preg_match($rule_value, $value)) {
+                            $this->addError($item, Lang::get('error.valid.nomatch', array('{{item}}' => $item)));
+                        }
+                        break;
+                    case 'Romano\Infrastructure\DB':
+                        if (is_array($rule_value)) $this->checkDB($rule_value, strtolower($item), strtolower($value));
+                        break;
+                    default:
+                        // needs to be logged
+                        exit(Lang::get('error.valid.norule', array('{{rule}}' => $item)));
+                        break;
+                }
+            }
+        }
+        if (!$this->errors) $this->data[$item] = $value;
+    }
+
+    public function requireAll()
+    {
+        foreach ($this->source as $key => $value) if (empty($value)) {
+            $this->addError(Lang::get('error.valid.required', array('{{item}}' => $item)));
+        }
+    }
+
+    public function checkDB($array, $where_key, $where_val)
+    {
+        $result = DB::run(
+            Query::table($array['table'])
+                ->where(array($where_key => $where_val))->build()
+        )->fetch();
+
+        if ($result) {
+            foreach ($array as $key => $value) {
+                switch ($key) {
+                    case 'unique':
+                        if ($result AND $value === true) {
+                            $this->addError($where_key, Lang::get('error.valid.db.exsits', array('{{item}}' => $where_key)));
+                        }
+                        break;
+                    case 'active':
+                        if ($result['active'] === 1 AND $value === false) {
+                            $this->addError($where_key, Lang::get('error.valid.db.active', array('{{item}}' => $where_key)));
+                        } elseif (empty($result['active']) AND $value === true) {
+                            $this->addError($where_key, Lang::get('error.valid.db.notactive', array('{{item}}' => $where_key)));
+                        }
+                        break;
+                }
+            }
+            if (!$this->errors) $this->data[$where_key] = $where_val;
+        }
+    }
+
+    private function addError($type, $error)
+    {
+        if (!isset($this->errors[$type])) $this->errors[$type]['id'] = $type;
+        $this->errors[$type]['msg'] = $error;
+        $this->gate = false;
+    }
+
+    public function errors()
+    {
+        return $this->errors;
+    }
+
+    public function get($item)
+    {
+        return trim($this->data[$item]);
+    }
+}

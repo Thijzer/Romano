@@ -1,0 +1,8 @@
+suites:
+  Main:
+    namespace: Romano
+    psr4_prefix: Romano
+    src_path: "%paths.config%/src"
+    spec_path: "%paths.config%/tests"
+
+formatter.name: pretty

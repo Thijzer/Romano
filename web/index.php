@@ -1,30 +1,30 @@
 <?php
 
-require '../bootstrap.php';
+require __DIR__.'/../vendor/autoload.php';
+require __DIR__.'/../app/config.php';
 
-// start Request
-$request = new Request($_SERVER, $_REQUEST);
+use \Romano\Framework\HTTP\Request;
+use \Romano\Framework\Application;
 
-// start Application Environment
-$application = new Application();
-$application->setRootConfiguration(dirname(__DIR__), 'settings/globals.php');
+$request = new Request();
+$application = new Application(dirname(__DIR__), $configuration);
 $application->buildEnvironmentFromRequest($request);
+$router = $application->buildRouter();
 
-// start Routes
-$route = new Route($request);
-if (($route->search($application->getRoutes())) && ($result = $route->getResource())) {
+if ($route = $router->search($request)) {
     $view = $request->get('VIEW');
     //$track = Track::get()->fromClient();
+    $response = $route->getResponse();
 
-    // route view
-    if ($route->getTemplate() && $view === config('view')) {
-        view($result);
-    } elseif (config('kernel_debug') === true && $view === 'dev') {
-        stamp('View');
-        massdump($result);
-    }
-} else {
-    Output::page(404);
+//    // route view
+//    if ($route->getTemplate() && $view === config('view')) {
+//        view($result);
+//    } elseif (config('kernel_debug') === true && $view === 'dev') {
+//        stamp('View');
+//        massdump($result);
+//    }
+//} else {
+//    Output::page(404);
 }
 
 

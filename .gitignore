@@ -28,3 +28,4 @@ pub/img
 views/home/about.php
 views/home/contact.php
 
+.data/*
